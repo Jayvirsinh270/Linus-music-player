@@ -27,13 +27,12 @@ jobs:
           channel: 'stable'
           cache: true
 
-      - name: Ensure Gradle 8.14 Wrapper
+      - name: Prepare Android Build & Gradle Wrapper
         working-directory: mobile/android
         run: |
-          if command -v gradle &> /dev/null; then
-            gradle wrapper --gradle-version 8.14
-          fi
-          chmod +x gradlew || true
+          echo "flutter.sdk=$FLUTTER_ROOT" > local.properties
+          mkdir -p gradle/wrapper
+          curl -sLo gradle/wrapper/gradle-wrapper.jar https://raw.githubusercontent.com/gradle/gradle/v8.14.0/gradle/wrapper/gradle-wrapper.jar
 
       - name: Install Dependencies
         working-directory: mobile
