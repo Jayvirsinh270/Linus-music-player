@@ -6,7 +6,7 @@ import '../models/track.dart';
 import '../services/audio_handler.dart';
 import '../services/recommendation_engine.dart';
 
-enum RepeatMode { off, all, one }
+enum PlaybackRepeatMode { off, all, one }
 
 class PlayerProvider extends ChangeNotifier {
   final LinusAudioHandler _audioHandler;
@@ -23,7 +23,7 @@ class PlayerProvider extends ChangeNotifier {
   Duration _duration = Duration.zero;
 
   bool _isShuffle = false;
-  RepeatMode _repeatMode = RepeatMode.off;
+  PlaybackRepeatMode _repeatMode = PlaybackRepeatMode.off;
 
   DateTime? _trackStartTime;
   Duration _accumulatedPlayed = Duration.zero;
@@ -41,7 +41,7 @@ class PlayerProvider extends ChangeNotifier {
   Duration get position => _position;
   Duration get duration => _duration;
   bool get isShuffle => _isShuffle;
-  RepeatMode get repeatMode => _repeatMode;
+  PlaybackRepeatMode get repeatMode => _repeatMode;
 
   bool isFavorite(String trackId) => _favorites.any((t) => t.id == trackId);
 
@@ -195,7 +195,7 @@ class PlayerProvider extends ChangeNotifier {
   }
 
   Future<void> _handleTrackEnd() async {
-    if (_repeatMode == RepeatMode.one && _currentTrack != null) {
+    if (_repeatMode == PlaybackRepeatMode.one && _currentTrack != null) {
       await seek(Duration.zero);
       await _audioHandler.play();
     } else {
@@ -224,12 +224,12 @@ class PlayerProvider extends ChangeNotifier {
   }
 
   void toggleRepeat() {
-    if (_repeatMode == RepeatMode.off) {
-      _repeatMode = RepeatMode.all;
-    } else if (_repeatMode == RepeatMode.all) {
-      _repeatMode = RepeatMode.one;
+    if (_repeatMode == PlaybackRepeatMode.off) {
+      _repeatMode = PlaybackRepeatMode.all;
+    } else if (_repeatMode == PlaybackRepeatMode.all) {
+      _repeatMode = PlaybackRepeatMode.one;
     } else {
-      _repeatMode = RepeatMode.off;
+      _repeatMode = PlaybackRepeatMode.off;
     }
     notifyListeners();
   }

@@ -344,10 +344,10 @@ class _PlayerScreenState extends State<PlayerScreen> {
                   ),
                   IconButton(
                     icon: Icon(
-                      player.repeatMode == RepeatMode.one
+                      player.repeatMode == PlaybackRepeatMode.one
                           ? Icons.repeat_one_rounded
                           : Icons.repeat_rounded,
-                      color: player.repeatMode != RepeatMode.off
+                      color: player.repeatMode != PlaybackRepeatMode.off
                           ? Theme.of(context).colorScheme.primary
                           : Colors.grey,
                       size: 24,
