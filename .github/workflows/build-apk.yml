@@ -27,84 +27,13 @@ jobs:
           channel: 'stable'
           cache: true
 
-      - name: Generate Android Scaffolding
-        working-directory: mobile
-        run: |
-          flutter create --platforms=android --org com.linus .
-
       - name: Ensure Gradle 8.14 Wrapper
-        working-directory: mobile
+        working-directory: mobile/android
         run: |
-          python3 -c "
-          prop_path = 'android/gradle/wrapper/gradle-wrapper.properties'
-          with open(prop_path, 'r', encoding='utf-8') as f:
-              c = f.read()
-          import re
-          c = re.sub(r'gradle-[\d\.]+-all\.zip', 'gradle-8.14-all.zip', c)
-          c = re.sub(r'gradle-[\d\.]+-bin\.zip', 'gradle-8.14-all.zip', c)
-          with open(prop_path, 'w', encoding='utf-8') as f:
-              f.write(c)
-          print('Set Gradle wrapper to 8.14-all!')
-          "
-
-      - name: Configure Android Audio Permissions and Service
-        working-directory: mobile
-        run: |
-          python3 -c "
-          manifest_path = 'android/app/src/main/AndroidManifest.xml'
-          with open(manifest_path, 'r', encoding='utf-8') as f:
-              content = f.read()
-
-          perms = '''
-              <uses-permission android:name=\"android.permission.INTERNET\"/>
-              <uses-permission android:name=\"android.permission.WAKE_LOCK\"/>
-              <uses-permission android:name=\"android.permission.FOREGROUND_SERVICE\"/>
-              <uses-permission android:name=\"android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK\"/>
-          '''
-          if 'FOREGROUND_SERVICE' not in content:
-              content = content.replace('<application', perms + '\n    <application')
-
-          if 'com.ryanheise.audioservice.AudioServiceActivity' not in content:
-              content = content.replace('io.flutter.embedding.android.FlutterActivity', 'com.ryanheise.audioservice.AudioServiceActivity')
-
-          service_def = '''
-                  <service
-                      android:name=\"com.ryanheise.audioservice.AudioService\"
-                      android:foregroundServiceType=\"mediaPlayback\"
-                      android:exported=\"true\">
-                      <intent-filter>
-                          <action android:name=\"android.media.browse.MediaBrowserService\" />
-                      </intent-filter>
-                  </service>
-                  <receiver
-                      android:name=\"androidx.media.session.MediaButtonReceiver\"
-                      android:exported=\"true\">
-                      <intent-filter>
-                          <action android:name=\"android.intent.action.MEDIA_BUTTON\" />
-                      </intent-filter>
-                  </receiver>
-          '''
-          if 'com.ryanheise.audioservice.AudioService' not in content:
-              content = content.replace('</application>', service_def + '\n    </application>')
-
-          with open(manifest_path, 'w', encoding='utf-8') as f:
-              f.write(content)
-          print('Successfully patched AndroidManifest.xml for AudioService!')
-          "
-
-      - name: Configure Android minSdk
-        working-directory: mobile
-        run: |
-          python3 -c "
-          gradle_path = 'android/app/build.gradle'
-          with open(gradle_path, 'r', encoding='utf-8') as f:
-              content = f.read()
-          content = content.replace('minSdkVersion flutter.minSdkVersion', 'minSdkVersion 21')
-          content = content.replace('minSdk = flutter.minSdkVersion', 'minSdk = 21')
-          with open(gradle_path, 'w', encoding='utf-8') as f:
-              f.write(content)
-          print('Ensured minSdk 21 in build.gradle!')
-          "
+          if command -v gradle &> /dev/null; then
+            gradle wrapper --gradle-version 8.14
+          fi
+          chmod +x gradlew || true
 
       - name: Install Dependencies
         working-directory: mobile
@@ -112,7 +41,7 @@ jobs:
 
       - name: Build Release APK
         working-directory: mobile
-        run: flutter build apk --release --android-skip-build-dependency-validation --verbose
+        run: flutter build apk --release --android-skip-build-dependency-validation
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
