@@ -6,8 +6,8 @@ import 'package:provider/provider.dart';
 import 'providers/player_provider.dart';
 import 'screens/main_navigation_screen.dart';
 import 'services/audio_handler.dart';
+import 'services/local_audio_service.dart';
 import 'services/recommendation_engine.dart';
-import 'services/youtube_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,13 +30,13 @@ void main() async {
     // AudioSession configuration fallback
   }
 
-  final ytService = YouTubeService();
-  final recEngine = RecommendationEngine(ytService);
+  final localAudioService = LocalAudioService();
+  final recEngine = RecommendationEngine(localAudioService);
   await recEngine.init();
 
   // Initialize Android background AudioService
   final audioHandler = await AudioService.init(
-    builder: () => LinusAudioHandler(ytService),
+    builder: () => LinusAudioHandler(),
     config: const AudioServiceConfig(
       androidNotificationChannelId: 'com.linus.musicplayer.audio',
       androidNotificationChannelName: 'Linus Music Playback',
@@ -47,27 +47,27 @@ void main() async {
 
   runApp(LinusApp(
     audioHandler: audioHandler,
-    ytService: ytService,
+    localAudioService: localAudioService,
     recEngine: recEngine,
   ));
 }
 
 class LinusApp extends StatelessWidget {
   final LinusAudioHandler audioHandler;
-  final YouTubeService ytService;
+  final LocalAudioService localAudioService;
   final RecommendationEngine recEngine;
 
   const LinusApp({
     super.key,
     required this.audioHandler,
-    required this.ytService,
+    required this.localAudioService,
     required this.recEngine,
   });
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => PlayerProvider(audioHandler, recEngine),
+      create: (_) => PlayerProvider(audioHandler, recEngine, localAudioService),
       child: MaterialApp(
         title: 'Linus',
         debugShowCheckedModeBanner: false,
@@ -83,7 +83,7 @@ class LinusApp extends StatelessWidget {
           fontFamily: 'Roboto',
         ),
         home: MainNavigationScreen(
-          ytService: ytService,
+          localAudioService: localAudioService,
           recEngine: recEngine,
         ),
       ),

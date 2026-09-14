@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:on_audio_query/on_audio_query.dart';
 import 'package:provider/provider.dart';
 import '../models/track.dart';
 import '../providers/player_provider.dart';
@@ -54,23 +55,35 @@ class TrackTile extends StatelessWidget {
             child: Stack(
               fit: StackFit.expand,
               children: [
-                track.thumbnailUrl.isNotEmpty
-                    ? CachedNetworkImage(
-                        imageUrl: track.thumbnailUrl,
-                        fit: BoxFit.cover,
-                        placeholder: (_, __) => Container(
-                          color: Colors.grey.shade900,
-                          child: const Icon(Icons.music_note, color: Colors.grey),
-                        ),
-                        errorWidget: (_, __, ___) => Container(
+                track.audioId != null
+                    ? QueryArtworkWidget(
+                        id: track.audioId!,
+                        type: ArtworkType.AUDIO,
+                        artworkWidth: 50,
+                        artworkHeight: 50,
+                        artworkFit: BoxFit.cover,
+                        nullArtworkWidget: Container(
                           color: Colors.grey.shade900,
                           child: const Icon(Icons.music_note, color: Colors.grey),
                         ),
                       )
-                    : Container(
-                        color: Colors.grey.shade900,
-                        child: const Icon(Icons.music_note, color: Colors.grey),
-                      ),
+                    : track.thumbnailUrl.isNotEmpty
+                        ? CachedNetworkImage(
+                            imageUrl: track.thumbnailUrl,
+                            fit: BoxFit.cover,
+                            placeholder: (_, __) => Container(
+                              color: Colors.grey.shade900,
+                              child: const Icon(Icons.music_note, color: Colors.grey),
+                            ),
+                            errorWidget: (_, __, ___) => Container(
+                              color: Colors.grey.shade900,
+                              child: const Icon(Icons.music_note, color: Colors.grey),
+                            ),
+                          )
+                        : Container(
+                            color: Colors.grey.shade900,
+                            child: const Icon(Icons.music_note, color: Colors.grey),
+                          ),
                 if (isBufferingThis)
                   Container(
                     color: Colors.black54,

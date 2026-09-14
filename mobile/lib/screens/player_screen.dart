@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:on_audio_query/on_audio_query.dart';
 import 'package:provider/provider.dart';
 import '../models/track.dart';
 import '../providers/player_provider.dart';
@@ -173,21 +174,34 @@ class _PlayerScreenState extends State<PlayerScreen> {
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(20),
-                      child: track.thumbnailUrl.isNotEmpty
-                          ? CachedNetworkImage(
-                              imageUrl: track.thumbnailUrl,
-                              fit: BoxFit.cover,
-                              errorWidget: (_, __, ___) => const Icon(
+                      child: track.audioId != null
+                          ? QueryArtworkWidget(
+                              id: track.audioId!,
+                              type: ArtworkType.AUDIO,
+                              artworkWidth: double.infinity,
+                              artworkHeight: double.infinity,
+                              artworkFit: BoxFit.cover,
+                              nullArtworkWidget: const Icon(
                                 Icons.music_note,
                                 size: 80,
                                 color: Colors.white24,
                               ),
                             )
-                          : const Icon(
-                              Icons.music_note,
-                              size: 80,
-                              color: Colors.white24,
-                            ),
+                          : track.thumbnailUrl.isNotEmpty
+                              ? CachedNetworkImage(
+                                  imageUrl: track.thumbnailUrl,
+                                  fit: BoxFit.cover,
+                                  errorWidget: (_, __, ___) => const Icon(
+                                    Icons.music_note,
+                                    size: 80,
+                                    color: Colors.white24,
+                                  ),
+                                )
+                              : const Icon(
+                                  Icons.music_note,
+                                  size: 80,
+                                  color: Colors.white24,
+                                ),
                     ),
                   ),
                 ),

@@ -2,17 +2,9 @@ import 'dart:async';
 import 'package:audio_service/audio_service.dart';
 import 'package:just_audio/just_audio.dart';
 import '../models/track.dart';
-import 'youtube_service.dart';
 
 class LinusAudioHandler extends BaseAudioHandler with SeekHandler {
   final AudioPlayer _player = AudioPlayer();
-  final YouTubeService _ytService;
-
-  static const Map<String, String> _ytHeaders = {
-    'User-Agent':
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-    'Referer': 'https://www.youtube.com/',
-  };
 
   Track? _currentTrack;
   Track? get currentTrack => _currentTrack;
@@ -23,7 +15,7 @@ class LinusAudioHandler extends BaseAudioHandler with SeekHandler {
   void Function()? onSkipPrevious;
   void Function(Track track, String message)? onPlaybackError;
 
-  LinusAudioHandler(this._ytService) {
+  LinusAudioHandler() {
     _initStreams();
   }
 
@@ -91,71 +83,24 @@ class LinusAudioHandler extends BaseAudioHandler with SeekHandler {
     _currentTrack = track;
     mediaItem.add(track.toMediaItem());
 
-    // Signal loading state immediately
+    // Signal loading state
     playbackState.add(playbackState.value.copyWith(
       processingState: AudioProcessingState.loading,
     ));
 
-    // 1. Resolve direct audio stream URL
-    String? streamUrl = track.streamUrl;
-    if (streamUrl == null || streamUrl.isEmpty) {
-      try {
-        streamUrl = await _ytService
-            .getAudioStreamUrl(track.id)
-            .timeout(const Duration(seconds: 12));
-        track.streamUrl = streamUrl;
-      } catch (e) {
-        streamUrl = null;
-      }
-    }
-
-    if (streamUrl == null) {
-      playbackState.add(playbackState.value.copyWith(
-        processingState: AudioProcessingState.idle,
-      ));
-      onPlaybackError?.call(track, 'Unable to get audio stream from YouTube.');
-      return;
-    }
-
-    // 2. Load and play stream with required browser headers to prevent 403 Forbidden
     try {
       await _player.stop();
-      await _player.setAudioSource(
-        AudioSource.uri(
-          Uri.parse(streamUrl),
-          headers: _ytHeaders,
-        ),
-      );
-      await _player.play();
-    } catch (firstError) {
-      // Stream may have expired or blocked; invalidate cache and retry once with fresh URL
-      _ytService.invalidateCache(track.id);
-
-      try {
-        final freshUrl = await _ytService
-            .getAudioStreamUrl(track.id, forceRefresh: true)
-            .timeout(const Duration(seconds: 12));
-
-        if (freshUrl != null) {
-          track.streamUrl = freshUrl;
-          await _player.stop();
-          await _player.setAudioSource(
-            AudioSource.uri(
-              Uri.parse(freshUrl),
-              headers: _ytHeaders,
-            ),
-          );
-          await _player.play();
-          return;
-        }
-      } catch (_) {
-        // Retry failed
+      if (track.filePath.startsWith('content://')) {
+        await _player.setAudioSource(AudioSource.uri(Uri.parse(track.filePath)));
+      } else {
+        await _player.setFilePath(track.filePath);
       }
-
+      await _player.play();
+    } catch (e) {
       playbackState.add(playbackState.value.copyWith(
         processingState: AudioProcessingState.idle,
       ));
-      onPlaybackError?.call(track, 'Stream playback error: ${firstError.toString()}');
+      onPlaybackError?.call(track, 'Unable to play local file: ${e.toString()}');
     }
   }
 

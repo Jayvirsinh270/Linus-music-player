@@ -6,6 +6,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/track.dart';
 import '../services/audio_handler.dart';
+import '../services/local_audio_service.dart';
 import '../services/recommendation_engine.dart';
 
 enum PlaybackRepeatMode { off, all, one }
@@ -13,9 +14,15 @@ enum PlaybackRepeatMode { off, all, one }
 class PlayerProvider extends ChangeNotifier {
   final LinusAudioHandler _audioHandler;
   final RecommendationEngine _recEngine;
+  final LocalAudioService _localAudioService;
 
   final StreamController<String> _errorController = StreamController<String>.broadcast();
   Stream<String> get errorStream => _errorController.stream;
+
+  List<Track> _deviceTracks = [];
+  bool _isLoadingTracks = true;
+  bool _hasPermission = false;
+  TrackSortType _currentSort = TrackSortType.title;
 
   Track? _currentTrack;
   final List<Track> _queue = [];
@@ -33,10 +40,16 @@ class PlayerProvider extends ChangeNotifier {
   DateTime? _trackStartTime;
   Duration _accumulatedPlayed = Duration.zero;
 
-  PlayerProvider(this._audioHandler, this._recEngine) {
+  PlayerProvider(this._audioHandler, this._recEngine, this._localAudioService) {
     _initListeners();
     _loadFavorites();
+    scanDeviceTracks();
   }
+
+  List<Track> get deviceTracks => List.unmodifiable(_deviceTracks);
+  bool get isLoadingTracks => _isLoadingTracks;
+  bool get hasPermission => _hasPermission;
+  TrackSortType get currentSort => _currentSort;
 
   Track? get currentTrack => _currentTrack;
   List<Track> get queue => List.unmodifiable(_queue);
@@ -51,13 +64,48 @@ class PlayerProvider extends ChangeNotifier {
 
   bool isFavorite(String trackId) => _favorites.any((t) => t.id == trackId);
 
+  // Scan or re-scan device for downloaded audio files
+  Future<void> scanDeviceTracks({TrackSortType? sortType}) async {
+    _isLoadingTracks = true;
+    if (sortType != null) _currentSort = sortType;
+    notifyListeners();
+
+    try {
+      final tracks = await _localAudioService.loadTracks(sortType: _currentSort);
+      _deviceTracks = tracks;
+      _hasPermission = tracks.isNotEmpty || await _localAudioService.requestPermissions();
+    } catch (_) {
+      _deviceTracks = [];
+    } finally {
+      _isLoadingTracks = false;
+      notifyListeners();
+    }
+  }
+
+  LocalAudioService get localAudioService => _localAudioService;
+
+  Future<bool> requestPermission() async {
+    final granted = await _localAudioService.requestPermissions();
+    if (granted) {
+      await scanDeviceTracks();
+    }
+    return granted;
+  }
+
+  Future<void> playAll({bool shuffle = false}) async {
+    if (_deviceTracks.isEmpty) return;
+    final list = List<Track>.from(_deviceTracks);
+    if (shuffle) {
+      list.shuffle();
+    }
+    await playTrack(list.first, newQueue: list);
+  }
+
   void _initListeners() {
-    // Audio handler completion hook
     _audioHandler.onTrackCompleted = () {
       _handleTrackEnd();
     };
 
-    // External hardware/notification button hooks
     _audioHandler.onSkipNext = () {
       skipNext();
     };
@@ -66,7 +114,6 @@ class PlayerProvider extends ChangeNotifier {
       skipPrevious();
     };
 
-    // Playback error hook - surface error and auto-skip smoothly
     _audioHandler.onPlaybackError = (track, message) {
       _isBuffering = false;
       _errorController.add("Playback error: ${track.title}. Skipping...");
@@ -74,13 +121,11 @@ class PlayerProvider extends ChangeNotifier {
       skipNext();
     };
 
-    // Position updates
     _audioHandler.positionStream.listen((pos) {
       _position = pos;
       notifyListeners();
     });
 
-    // Duration updates
     _audioHandler.durationStream.listen((dur) {
       if (dur != null) {
         _duration = dur;
@@ -88,7 +133,6 @@ class PlayerProvider extends ChangeNotifier {
       }
     });
 
-    // PlaybackState updates from audio_service (catches loading state during network calls)
     _audioHandler.playbackState.listen((state) {
       final isStateBuffering = state.processingState == AudioProcessingState.buffering ||
           state.processingState == AudioProcessingState.loading;
@@ -98,7 +142,6 @@ class PlayerProvider extends ChangeNotifier {
       }
     });
 
-    // Player state updates (play/pause)
     _audioHandler.playerStateStream.listen((state) {
       _isPlaying = state.playing;
       final isPlayerBuffering = state.processingState == ProcessingState.buffering ||
@@ -204,7 +247,6 @@ class PlayerProvider extends ChangeNotifier {
       final nextTrack = _queue.removeAt(0);
       await playTrack(nextTrack);
     } else if (_currentTrack != null) {
-      // Smart Autoplay / Radio continuation
       final nextAutoplay = await _recEngine.getNextAutoplayTrack(
         _currentTrack!,
         {..._history.map((t) => t.id), _currentTrack!.id},
@@ -217,7 +259,6 @@ class PlayerProvider extends ChangeNotifier {
 
   Future<void> skipPrevious() async {
     if (_position.inSeconds > 3) {
-      // Seek back to start if already played more than 3 seconds
       await seek(Duration.zero);
       return;
     }

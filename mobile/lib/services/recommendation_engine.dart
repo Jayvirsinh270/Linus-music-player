@@ -1,17 +1,17 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/track.dart';
-import 'youtube_service.dart';
+import 'local_audio_service.dart';
 
 class RecommendationEngine {
   static const String _historyKey = 'linus_play_history';
   static const String _artistScoresKey = 'linus_artist_scores';
 
-  final YouTubeService _ytService;
+  final LocalAudioService _localAudioService;
   final Map<String, int> _artistScores = {};
   final List<Track> _recentHistory = [];
 
-  RecommendationEngine(this._ytService);
+  RecommendationEngine(this._localAudioService);
 
   Future<void> init() async {
     final prefs = await SharedPreferences.getInstance();
@@ -47,20 +47,18 @@ class RecommendationEngine {
   }) async {
     final prefs = await SharedPreferences.getInstance();
 
-    // Determine completion ratio
     final double ratio = totalDuration.inSeconds > 0
         ? playedDuration.inSeconds / totalDuration.inSeconds
         : 0.0;
     final bool skippedEarly = playedDuration.inSeconds < 20 && totalDuration.inSeconds > 40;
 
-    // Update artist affinity score
     final artist = track.artist.toLowerCase().trim();
     int currentScore = _artistScores[artist] ?? 0;
 
     if (skippedEarly) {
-      currentScore -= 2; // User didn't want this track
+      currentScore -= 2;
     } else if (ratio >= 0.6) {
-      currentScore += 3; // High affinity completion
+      currentScore += 3;
     } else {
       currentScore += 1;
     }
@@ -81,36 +79,51 @@ class RecommendationEngine {
   }
 
   Future<Track?> getNextAutoplayTrack(Track currentTrack, Set<String> currentQueueIds) async {
-    // 1. Fetch related tracks from YouTube
-    final related = await _ytService.getRelatedTracks(currentTrack.id);
-    if (related.isEmpty) return null;
+    final allTracks = _localAudioService.cachedTracks;
+    if (allTracks.isEmpty) return null;
 
-    // 2. Filter out items already in the queue or just played
-    final candidates = related.where((t) => !currentQueueIds.contains(t.id)).toList();
-    if (candidates.isEmpty) return related.first;
+    // Filter out already played or queued songs
+    final candidates = allTracks.where((t) => !currentQueueIds.contains(t.id) && t.id != currentTrack.id).toList();
+    if (candidates.isEmpty) {
+      return allTracks.firstWhere((t) => t.id != currentTrack.id, orElse: () => allTracks.first);
+    }
 
-    // 3. Rank candidates based on artist affinity
+    // 1. Prioritize songs from same artist or same album
+    final sameArtist = candidates.where((t) => t.artist.toLowerCase() == currentTrack.artist.toLowerCase()).toList();
+    if (sameArtist.isNotEmpty) {
+      sameArtist.shuffle();
+      return sameArtist.first;
+    }
+
+    // 2. Rank candidates based on user's listening habits (artist affinity)
     candidates.sort((a, b) {
       final scoreA = _artistScores[a.artist.toLowerCase().trim()] ?? 0;
       final scoreB = _artistScores[b.artist.toLowerCase().trim()] ?? 0;
-      return scoreB.compareTo(scoreA); // Highest score first
+      return scoreB.compareTo(scoreA);
     });
 
     return candidates.first;
   }
 
-  Future<List<Track>> getSuggestedPicks() async {
+  List<Track> getSuggestedPicks() {
+    final allTracks = _localAudioService.cachedTracks;
+    if (allTracks.isEmpty) return [];
+
     if (_recentHistory.isEmpty) {
-      final trending = await _ytService.getTrendingTracks();
-      if (trending.isNotEmpty) return trending;
-      return _ytService.searchTracks('Top Music Hits');
+      // Return a smart mix of available device songs
+      final list = List<Track>.from(allTracks);
+      list.shuffle();
+      return list.take(15).toList();
     }
 
-    final seedTrack = _recentHistory.first;
-    final suggestions = await _ytService.getRelatedTracks(seedTrack.id);
-    if (suggestions.isNotEmpty) {
-      return suggestions.take(15).toList();
-    }
-    return _ytService.getTrendingTracks();
+    // Rank local songs matching user's top preferred artists
+    final list = List<Track>.from(allTracks);
+    list.sort((a, b) {
+      final scoreA = _artistScores[a.artist.toLowerCase().trim()] ?? 0;
+      final scoreB = _artistScores[b.artist.toLowerCase().trim()] ?? 0;
+      return scoreB.compareTo(scoreA);
+    });
+
+    return list.take(15).toList();
   }
 }

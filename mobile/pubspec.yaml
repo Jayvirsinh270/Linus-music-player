@@ -1,5 +1,5 @@
 name: linus_player
-description: "Linus - Seamless YouTube Music Player for Android"
+description: "Linus - High-Fidelity Offline Device Music Player for Android"
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -12,7 +12,8 @@ dependencies:
   just_audio: ^0.9.43
   audio_service: ^0.18.17
   audio_session: ^0.1.21
-  youtube_explode_dart: ^2.4.4
+  on_audio_query: ^2.9.0
+  permission_handler: ^11.3.1
   provider: ^6.1.2
   shared_preferences: ^2.3.5
   cached_network_image: ^3.4.1

@@ -6,10 +6,17 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
+    <!-- Android 13+ Granular Audio Permission -->
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO"/>
+    <!-- Android 12 and below Storage Permissions -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29"/>
+
     <application
         android:label="Linus"
         android:name="${applicationName}"
         android:icon="@android:drawable/sym_def_app_icon"
+        android:requestLegacyExternalStorage="true"
         android:usesCleartextTraffic="true">
         <activity
             android:name="com.ryanheise.audioservice.AudioServiceActivity"

@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:on_audio_query/on_audio_query.dart';
 import 'package:provider/provider.dart';
 import '../providers/player_provider.dart';
 import '../screens/player_screen.dart';
@@ -72,13 +73,22 @@ class MiniPlayer extends StatelessWidget {
                     child: SizedBox(
                       width: 44,
                       height: 44,
-                      child: track.thumbnailUrl.isNotEmpty
-                          ? CachedNetworkImage(
-                              imageUrl: track.thumbnailUrl,
-                              fit: BoxFit.cover,
-                              errorWidget: (_, __, ___) => const Icon(Icons.music_note),
+                      child: track.audioId != null
+                          ? QueryArtworkWidget(
+                              id: track.audioId!,
+                              type: ArtworkType.AUDIO,
+                              artworkWidth: 44,
+                              artworkHeight: 44,
+                              artworkFit: BoxFit.cover,
+                              nullArtworkWidget: const Icon(Icons.music_note),
                             )
-                          : const Icon(Icons.music_note),
+                          : track.thumbnailUrl.isNotEmpty
+                              ? CachedNetworkImage(
+                                  imageUrl: track.thumbnailUrl,
+                                  fit: BoxFit.cover,
+                                  errorWidget: (_, __, ___) => const Icon(Icons.music_note),
+                                )
+                              : const Icon(Icons.music_note),
                     ),
                   ),
                   const SizedBox(width: 12),

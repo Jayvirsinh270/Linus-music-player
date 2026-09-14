@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
+import '../services/local_audio_service.dart';
 import '../services/recommendation_engine.dart';
-import '../services/youtube_service.dart';
 import '../widgets/mini_player.dart';
 import 'favorites_history_screen.dart';
 import 'home_screen.dart';
 import 'search_screen.dart';
 
 class MainNavigationScreen extends StatefulWidget {
-  final YouTubeService ytService;
+  final LocalAudioService localAudioService;
   final RecommendationEngine recEngine;
 
   const MainNavigationScreen({
     super.key,
-    required this.ytService,
+    required this.localAudioService,
     required this.recEngine,
   });
 
@@ -26,8 +26,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   @override
   Widget build(BuildContext context) {
     final screens = [
-      HomeScreen(ytService: widget.ytService, recEngine: widget.recEngine),
-      SearchScreen(ytService: widget.ytService),
+      HomeScreen(
+        localAudioService: widget.localAudioService,
+        recEngine: widget.recEngine,
+      ),
+      SearchScreen(localAudioService: widget.localAudioService),
       FavoritesHistoryScreen(recEngine: widget.recEngine),
     ];
 
