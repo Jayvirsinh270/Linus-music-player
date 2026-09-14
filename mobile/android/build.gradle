@@ -13,13 +13,22 @@ subprojects {
     project.evaluationDependsOn(':app')
 }
 
-subprojects {
-    afterEvaluate { project ->
-        if (project.hasProperty('android')) {
-            project.android {
-                if (namespace == null) {
-                    namespace project.group.toString()
+subprojects { project ->
+    if (project.name != 'app') {
+        def configureProject = {
+            if (project.hasProperty('android')) {
+                project.android {
+                    if (namespace == null) {
+                        namespace project.group.toString()
+                    }
                 }
+            }
+        }
+        if (project.state.executed) {
+            configureProject()
+        } else {
+            project.afterEvaluate {
+                configureProject()
             }
         }
     }
