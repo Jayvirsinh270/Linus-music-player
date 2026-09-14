@@ -32,6 +32,21 @@ jobs:
         run: |
           flutter create --platforms=android --org com.linus .
 
+      - name: Ensure Gradle 8.14 Wrapper
+        working-directory: mobile
+        run: |
+          python3 -c "
+          prop_path = 'android/gradle/wrapper/gradle-wrapper.properties'
+          with open(prop_path, 'r', encoding='utf-8') as f:
+              c = f.read()
+          import re
+          c = re.sub(r'gradle-[\d\.]+-all\.zip', 'gradle-8.14-all.zip', c)
+          c = re.sub(r'gradle-[\d\.]+-bin\.zip', 'gradle-8.14-all.zip', c)
+          with open(prop_path, 'w', encoding='utf-8') as f:
+              f.write(c)
+          print('Set Gradle wrapper to 8.14-all!')
+          "
+
       - name: Configure Android Audio Permissions and Service
         working-directory: mobile
         run: |
@@ -97,7 +112,7 @@ jobs:
 
       - name: Build Release APK
         working-directory: mobile
-        run: flutter build apk --release --verbose
+        run: flutter build apk --release --android-skip-build-dependency-validation --verbose
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
