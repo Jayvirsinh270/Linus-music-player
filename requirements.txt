@@ -1,0 +1,5 @@
+Flask==2.3.3
+PyMySQL==1.1.1
+yt-dlp
+requests
+mutagen

@@ -1,0 +1,3282 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Linus | Aesthetic Listening</title>
+  
+  <!-- Typography & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  
+  <!-- Consolidated Stylesheet -->
+  <link rel="stylesheet" href="/static/styles.css?v=7.1">
+  <link rel="stylesheet" href="/static/dj_styles.css?v=1.2">
+  <link rel="stylesheet" href="/static/tour.css?v=1.0">
+</head>
+<body>
+  <!-- Welcome Quote Splash Screen Overlay -->
+  <div id="quote-splash-overlay" class="quote-splash-overlay" aria-modal="true" role="dialog" aria-label="Daily Inspiration">
+    <div class="quote-splash-backdrop"></div>
+    <div class="quote-splash-glow"></div>
+    <div class="quote-splash-ambient-aura"></div>
+    
+    <div class="quote-splash-card">
+      <div class="quote-splash-top-row">
+        <div class="quote-splash-badge">
+          <i class="ph-fill ph-sparkle"></i>
+          <span>Thought of the Moment</span>
+        </div>
+        <button type="button" class="quote-splash-skip-corner-btn" id="quote-splash-corner-skip" title="Enter immediately (or press Space / Esc)">
+          <span>Skip</span> <kbd>Esc</kbd>
+        </button>
+      </div>
+
+      <div class="quote-splash-glyph-wrap">
+        <i class="ph-fill ph-quotes quote-splash-glyph"></i>
+      </div>
+
+      <blockquote id="quote-splash-text" class="quote-splash-text">
+        “Knowing yourself is the beginning of all wisdom.”
+      </blockquote>
+
+      <div class="quote-splash-meta">
+        <span class="quote-splash-line"></span>
+        <cite id="quote-splash-author" class="quote-splash-author">Aristotle</cite>
+        <span class="quote-splash-tag" id="quote-splash-tag">Wisdom</span>
+      </div>
+
+      <div class="quote-splash-actions">
+        <button type="button" class="quote-splash-btn quote-splash-shuffle-btn" id="quote-splash-shuffle-btn" title="Discover another thought">
+          <i class="ph-bold ph-shuffle"></i> <span>Another thought</span>
+        </button>
+        <button type="button" class="quote-splash-btn quote-splash-enter-btn" id="quote-splash-enter-btn" title="Enter music player">
+          <span>Enter Sanctuary</span> <i class="ph-bold ph-arrow-right"></i>
+        </button>
+      </div>
+
+      <div class="quote-splash-hint">
+        Touch anywhere on screen or press <kbd>Space</kbd> to enter
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-mesh"></div>
+  <!-- Living Breathing Ambient Aura Canvas -->
+  <canvas id="living-aura-canvas" class="living-aura-canvas"></canvas>
+  <!-- Dedicated Real-Time Procedural Live Motion Canvas Engine -->
+  <canvas id="live-motion-canvas" class="live-wallpaper-video hidden"></canvas>
+  <!-- Live Video Wallpaper Engine -->
+  <video id="live-wallpaper-video" class="live-wallpaper-video hidden" loop muted playsinline autoplay></video>
+  <!-- Custom Photo Wallpaper Engine -->
+  <div id="custom-wallpaper-bg" class="custom-wallpaper-bg hidden"></div>
+  <!-- Dynamic Dim Overlay -->
+  <div id="wallpaper-dim-overlay" class="wallpaper-dim-overlay"></div>
+  <div id="vibe-confetti-container" class="vibe-confetti-container"></div>
+  
+  <div class="app-shell">
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+    
+    <!-- Floating Edge Trigger Handle (Touch/Click to summon Sidebar) -->
+    <button class="sidebar-edge-trigger" id="sidebar-edge-trigger" title="Open Navigation Menu (Touch or Click)" aria-label="Open Navigation Menu">
+      <div class="edge-trigger-pill">
+        <i class="ph-bold ph-caret-right edge-trigger-icon"></i>
+        <span class="edge-trigger-text">Menu</span>
+      </div>
+      <div class="edge-trigger-glow"></div>
+    </button>
+    
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a class="brand" href="#library"><i class="ph-fill ph-vinyl-record"></i> Linus.</a>
+        <div class="sidebar-header-actions">
+          <button class="round-action sidebar-pin-btn" id="sidebar-pin-btn" title="Pin sidebar visible"><i class="ph ph-push-pin"></i></button>
+          <button class="round-action sidebar-close-btn" id="sidebar-close-btn" title="Close Menu"><i class="ph ph-x"></i></button>
+        </div>
+        <p class="tagline">Your serene audio space</p>
+      </div>
+      
+      <nav class="nav">
+        <button class="nav-item active" data-view="library"><i class="ph ph-music-notes-simple"></i> Library</button>
+        <button class="nav-item" data-view="explore"><i class="ph ph-compass"></i> Explore</button>
+        <button class="nav-item" data-view="videos"><i class="ph ph-film-strip"></i> Videos</button>
+        <button class="nav-item" data-view="playlists"><i class="ph ph-list-dashes"></i> Playlists</button>
+        <button class="nav-item" data-view="favorites"><i class="ph ph-star"></i> Favorites</button>
+        <button class="nav-item" data-view="lyrics"><i class="ph ph-quotes"></i> Lyrics</button>
+        <button class="nav-item" data-view="downloads"><i class="ph ph-download-simple"></i> Downloads</button>
+        <button class="nav-item" data-view="dj-studio" style="color:#38bdf8;"><i class="ph-bold ph-sliders"></i> DJ Studio</button>
+      </nav>
+      
+      <div class="sidebar-bottom">
+        <button class="soft-button" id="sidebar-tour-btn" style="color:var(--accent);"><i class="ph-fill ph-sparkle"></i> Feature Tour</button>
+        <button class="soft-button" id="sidebar-studio-btn"><i class="ph-fill ph-paint-brush-broad"></i> Studio Customizer</button>
+        <button class="soft-button" id="manage-folders"><i class="ph ph-folder-open"></i> Manage Folders</button>
+        <button class="soft-button" id="download-button"><i class="ph ph-link"></i> Download media</button>
+        <div class="status-box">
+          <p class="edition">v2.0 Aesthetic</p>
+          <p class="database-status" id="database-status">Metadata: Checking...</p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      
+      <!-- Topbar -->
+      <header class="topbar">
+        <div class="topbar-left-group" style="display:flex;align-items:center;gap:10px;flex:1;max-width:400px;">
+          <!-- Mobile Hamburger Toggle -->
+          <button class="round-action mobile-menu-btn" id="mobile-menu-btn" title="Menu"><i class="ph ph-list"></i></button>
+          
+          <div class="topbar-search">
+            <i class="ph ph-magnifying-glass"></i>
+            <input id="search" type="search" placeholder="Search your sanctuary...">
+          </div>
+        </div>
+        
+        <div class="topbar-actions">
+          <!-- 1-Click Online ⇄ Offline Smart Autoplay Radio Mode Toggle -->
+          <button class="cozy-quick-btn radio-mode-toggle-btn online" id="radio-mode-toggle-btn" title="Toggle Autoplay Mode: Online (YouTube infinite discovery) vs Offline (Local Library)">
+            <i class="ph-fill ph-globe" id="radio-mode-icon"></i>
+            <span id="radio-mode-text">Online Radio</span>
+          </button>
+
+          <!-- 1-Click Quick Cozy Mode Toggle -->
+          <button class="cozy-quick-btn" id="cozy-mode-quick-btn" title="Toggle Cozy Listening Mode (Candlelight & Rain)">
+            <i class="ph-fill ph-coffee"></i>
+            <span>Cozy Mode</span>
+          </button>
+
+          <!-- Vibe & Atmosphere Palette Switcher -->
+          <div class="vibe-switcher-wrapper">
+            <button class="round-action" id="theme-button" title="Atmospheric Moods & Vibes">
+              <i class="ph-fill ph-palette"></i>
+            </button>
+
+            <!-- Floating Vibe Selector Popover -->
+            <div class="vibe-popover" id="vibe-popover">
+              <div class="vibe-popover-header">
+                <span class="eyebrow" style="margin:0;">ATMOSPHERIC VIBES</span>
+              </div>
+              <div class="vibe-presets-grid">
+                <button class="vibe-preset-card active" data-vibe="cozy">
+                  <div class="vibe-swatch swatch-cozy"></div>
+                  <div class="vibe-meta">
+                    <strong>☕ Lo-Fi Cozy</strong>
+                    <span>Amber Firelight & Honey</span>
+                  </div>
+                </button>
+                <button class="vibe-preset-card" data-vibe="ecstatic">
+                  <div class="vibe-swatch swatch-ecstatic"></div>
+                  <div class="vibe-meta">
+                    <strong>🌌 Cyber Ecstatic</strong>
+                    <span>Electric Neon & Aurora</span>
+                  </div>
+                </button>
+                <button class="vibe-preset-card" data-vibe="sakura">
+                  <div class="vibe-swatch swatch-sakura"></div>
+                  <div class="vibe-meta">
+                    <strong>🌸 Sunset Sakura</strong>
+                    <span>Twilight Rose & Peach</span>
+                  </div>
+                </button>
+                <button class="vibe-preset-card" data-vibe="emerald">
+                  <div class="vibe-swatch swatch-emerald"></div>
+                  <div class="vibe-meta">
+                    <strong>🌲 Emerald Forest</strong>
+                    <span>Deep Moss & Tranquility</span>
+                  </div>
+                </button>
+                <button class="vibe-preset-card" data-vibe="ocean">
+                  <div class="vibe-swatch swatch-ocean"></div>
+                  <div class="vibe-meta">
+                    <strong>🌊 Midnight Ocean</strong>
+                    <span>Bioluminescent Aqua</span>
+                  </div>
+                </button>
+                <button class="vibe-preset-card" data-vibe="noir">
+                  <div class="vibe-swatch swatch-noir"></div>
+                  <div class="vibe-meta">
+                    <strong>🌑 Titanium Noir</strong>
+                    <span>Minimal Monochromatic</span>
+                  </div>
+                </button>
+              </div>
+
+              <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);">
+                <button class="btn-primary" id="open-studio-customizer-btn" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;">
+                  <i class="ph-fill ph-paint-brush-broad"></i> Open Full Studio Customizer
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- View: Library (Home) -->
+      <div id="library-view" class="view">
+        
+
+        <!-- =====================================================
+             Top Header: Apple Music / Spotify Centered Greeting & Streak
+        ===================================================== -->
+        <div class="dashboard-hero-header">
+          <div class="dashboard-hero-title-group">
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+              <h1 id="rec-greeting" class="rec-greeting">Good Evening</h1>
+              <span class="rec-streak-badge" id="rec-streak-badge" title="Active Listening Streak (Click to view calendar heatmap)" role="button" tabindex="0">
+                <i class="ph-fill ph-fire streak-fire-icon"></i>
+                <span id="streak-days-val">1</span> Day Streak
+              </span>
+            </div>
+            <p id="rec-greeting-sub" class="rec-greeting-sub">Inspired by Spotify, Apple Music, and YouTube Music.</p>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <button class="rewind-launch-btn" id="open-weekly-rewind-btn" title="View your Weekly Sound Rewind & Musical Persona">
+              <i class="ph-bold ph-calendar-star"></i>
+              <span>Weekly Rewind</span>
+            </button>
+            <button class="rec-refresh-btn" id="rec-refresh-btn" title="Refresh recommendations">
+              <i class="ph ph-arrows-clockwise"></i>
+              <span>Refresh</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- =====================================================
+             Interactive Circadian Mood Filter Chips Bar
+        ===================================================== -->
+        <div class="mood-chips-bar" id="mood-chips-bar">
+          <button class="mood-chip active" data-mood="all"><i class="ph-fill ph-sparkle"></i> All</button>
+          <button class="mood-chip" data-mood="chill"><i class="ph-fill ph-coffee"></i> Chill & Lo-Fi</button>
+          <button class="mood-chip" data-mood="energy"><i class="ph-fill ph-lightning"></i> High Energy</button>
+          <button class="mood-chip" data-mood="focus"><i class="ph-fill ph-brain"></i> Focus & Flow</button>
+          <button class="mood-chip" data-mood="night"><i class="ph-fill ph-moon-stars"></i> Late Night</button>
+          <button class="mood-chip" data-mood="discovery"><i class="ph-fill ph-compass"></i> Discovery</button>
+        </div>
+
+        <!-- =====================================================
+             6-Card Quick Launchpad (Instant 1-Click Dopamine Grid)
+        ===================================================== -->
+        <div class="rec-quick-grid" id="rec-quick-grid">
+          <!-- Dynamically populated by JS (Daily Mix 1, Liked Songs, Artist Radio, Continue, Mood, Most Played) -->
+        </div>
+
+        <!-- =====================================================
+             Hero Deck: Left (Now Playing) + Right (Up Next Queue)
+        ===================================================== -->
+        <div class="hero-deck" id="hero-deck">
+          <!-- Left Column: Now Playing Card with Waveform & Controls -->
+          <div id="hero-now-playing-card" class="hero-np-card">
+            <div class="hero-np-art-wrap" id="vinyl-record">
+              <div class="hero-np-art" id="album-art-box">
+                <i class="ph-fill ph-music-notes-simple"></i>
+              </div>
+            </div>
+
+            <div class="hero-np-body">
+              <div class="hero-np-head">
+                <div class="hero-np-text-group">
+                  <h2 class="hero-np-title" id="hero-title">Silence<br><em>is golden.</em></h2>
+                  <p class="hero-np-artist" id="hero-artist">Awaiting your selection.</p>
+                </div>
+                <span class="hero-np-meta" id="hero-format">Local Audio</span>
+              </div>
+
+              <!-- Golden Animated Audio Waveform Visualizer -->
+              <div class="hero-np-waveform-wrap">
+                <canvas id="hero-waveform-canvas" class="hero-waveform-canvas" width="500" height="42"></canvas>
+              </div>
+
+              <!-- Sleek Playback Controls Row -->
+              <div class="hero-np-controls">
+                <div class="hero-np-main-playback">
+                  <button class="hero-np-ctrl-btn" id="hero-prev" title="Previous Track">
+                    <i class="ph-fill ph-skip-back"></i>
+                  </button>
+                  <button class="hero-np-play-btn" id="hero-play" title="Play / Pause">
+                    <i class="ph-fill ph-play"></i>
+                  </button>
+                  <button class="hero-np-ctrl-btn" id="hero-next" title="Next Track">
+                    <i class="ph-fill ph-skip-forward"></i>
+                  </button>
+                </div>
+                <div class="hero-np-extra-btns">
+                  <button class="hero-np-sub-btn" id="hero-fav-btn" title="Favorite">
+                    <i class="ph ph-star"></i>
+                  </button>
+                  <button class="hero-np-sub-btn" id="hero-lyrics" title="Lyrics">
+                    <i class="ph ph-quotes"></i>
+                  </button>
+                  <button class="hero-np-sub-btn" id="hero-add-playlist" title="Add to Playlist">
+                    <i class="ph ph-plus-circle"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Up Next Mini Queue Widget & 2D Vibe Compass -->
+          <div class="hero-up-next-card" id="hero-up-next-card">
+            <div class="hero-up-next-header">
+              <div class="hero-deck-tabs">
+                <button class="hero-deck-tab-btn active" id="tab-up-next-queue" title="View Upcoming Queue">
+                  <i class="ph-fill ph-queue"></i>
+                  <span>Up Next</span>
+                </button>
+                <button class="hero-deck-tab-btn" id="tab-up-next-vibe" title="2D Vibe Compass & Mood Dial">
+                  <i class="ph-bold ph-compass"></i>
+                  <span>Vibe Compass</span>
+                </button>
+              </div>
+              <button class="up-next-view-all" id="hero-open-queue" title="Open Full Queue">
+                <i class="ph ph-list-dashes"></i>
+              </button>
+            </div>
+
+            <!-- View 1: Standard Up Next List -->
+            <div class="hero-up-next-list" id="hero-up-next-list">
+              <!-- Dynamically populated by JS (next 3 songs) -->
+              <div class="up-next-empty">
+                <i class="ph ph-music-note"></i>
+                <span>Queue is empty</span>
+              </div>
+            </div>
+
+            <!-- View 2: 2D Vibe Compass / Mood Dial Pad -->
+            <div class="hero-vibe-compass-view hidden" id="hero-vibe-compass-view">
+              <!-- Active Vibe Badge & Readout -->
+              <div class="vibe-compass-status">
+                <div class="vibe-compass-badge" id="vibe-compass-badge">
+                  <i class="ph-fill ph-sun" id="vibe-compass-icon"></i>
+                  <span id="vibe-compass-title">Sunburst &amp; Euphoric</span>
+                </div>
+                <div class="vibe-coords-readout" id="vibe-coords-readout">
+                  <span id="vibe-coord-x">V: +0.00</span>
+                  <span id="vibe-coord-y">E: +0.00</span>
+                </div>
+              </div>
+
+              <!-- 2D Interactive Radar Compass Pad -->
+              <div class="vibe-radar-pad-wrap">
+                <div class="vibe-radar-pad" id="vibe-radar-pad" role="slider" aria-label="2D Vibe Compass Mood Pad" tabindex="0">
+                  <!-- Axis Crosshairs -->
+                  <div class="vibe-axis-x"></div>
+                  <div class="vibe-axis-y"></div>
+                  <div class="vibe-radar-rings"></div>
+
+                  <!-- Quadrant Labels -->
+                  <span class="vibe-quad-label q-top">⚡ ENERGETIC</span>
+                  <span class="vibe-quad-label q-bottom">☕ CHILL</span>
+                  <span class="vibe-quad-label q-left">🌧️ MELANCHOLIC</span>
+                  <span class="vibe-quad-label q-right">☀️ JOYFUL</span>
+
+                  <!-- Draggable Glowing Puck -->
+                  <div class="vibe-puck" id="vibe-puck" style="left:50%; top:50%;">
+                    <div class="vibe-puck-core"></div>
+                    <div class="vibe-puck-aura" id="vibe-puck-aura"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Quick Presets Bar -->
+              <div class="vibe-presets-bar">
+                <button class="vibe-preset-chip active" data-x="0.0" data-y="0.0" title="Balanced Center">🎯 Balanced</button>
+                <button class="vibe-preset-chip" data-x="-0.5" data-y="-0.6" title="Lo-Fi Cozy Chill">☕ Lo-Fi</button>
+                <button class="vibe-preset-chip" data-x="-0.4" data-y="0.8" title="High Voltage Rage">⚡ Voltage</button>
+                <button class="vibe-preset-chip" data-x="0.7" data-y="0.7" title="Sunburst Euphoric Pop">☀️ Sunburst</button>
+                <button class="vibe-preset-chip" data-x="-0.7" data-y="-0.7" title="Midnight Somber Rain">🌙 Midnight</button>
+                <button class="vibe-preset-chip" data-x="0.6" data-y="-0.6" title="Zen Serene Harmony">🌿 Zen</button>
+              </div>
+
+              <!-- Action Controls -->
+              <div class="vibe-actions-row">
+                <button class="vibe-action-btn btn-secondary" id="vibe-morph-queue-btn" title="Reorder upcoming queue by this mood">
+                  <i class="ph-bold ph-arrows-down-up"></i>
+                  <span>Morph Queue</span>
+                </button>
+                <button class="vibe-action-btn btn-primary" id="vibe-instant-mix-btn" title="Play 15-track curated mix for this mood">
+                  <i class="ph-fill ph-play"></i>
+                  <span>Play Vibe Mix</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================================
+             Recommendation Dashboard Shelves (Spotify / YouTube style)
+        ============================================================ -->
+        <div id="rec-dashboard" class="rec-dashboard">
+
+          <!-- Shelf: Daily Mix Capsules -->
+          <div class="rec-shelf" id="shelf-capsules" style="display:none" data-moods="all,chill,energy,focus,night">
+            <div class="rec-shelf-header">
+              <div class="rec-shelf-title-group">
+                <i class="ph-fill ph-sparkle rec-shelf-icon"></i>
+                <div>
+                  <h3 class="rec-shelf-title">Made For You — Daily Mix Capsules</h3>
+                  <p class="rec-shelf-sub">Curated soundscapes tailored to every mood</p>
+                </div>
+              </div>
+            </div>
+            <div class="rec-capsules-grid" id="cards-capsules"></div>
+          </div>
+
+          <!-- Shelf: Sonic DNA & Listening Identity -->
+          <div class="rec-shelf" id="shelf-sonic-dna" style="display:none" data-moods="all,focus,night">
+            <div class="rec-shelf-header">
+              <div class="rec-shelf-title-group">
+                <i class="ph-fill ph-fingerprint rec-shelf-icon"></i>
+                <div>
+                  <h3 class="rec-shelf-title">Your Sonic Identity</h3>
+                  <p class="rec-shelf-sub">Your personal taste profile and listening DNA</p>
+                </div>
+              </div>
+            </div>
+            <div class="sonic-dna-card" id="sonic-dna-card"></div>
+          </div>
+
+          <!-- Shelf: Daily Listening Streak & Music Calendar Heatmap -->
+          <div class="rec-shelf" id="shelf-streak-heatmap" style="display:none" data-moods="all,focus,chill,energy,night,discovery">
+            <div class="rec-shelf-header">
+              <div class="rec-shelf-title-group">
+                <i class="ph-fill ph-fire rec-shelf-icon streak-header-fire"></i>
+                <div>
+                  <h3 class="rec-shelf-title">Daily Listening Streak &amp; Activity</h3>
+                  <p class="rec-shelf-sub">Track your daily music habits and keep your sonic flame alive</p>
+                </div>
+              </div>
+              <div class="rec-shelf-actions">
+                <span class="streak-header-pill" id="streak-header-pill">
+                  <i class="ph-fill ph-fire"></i>
+                  <span id="streak-header-pill-text">Checking streak...</span>
+                </span>
+              </div>
+            </div>
+            <div class="streak-heatmap-card" id="streak-heatmap-card">
+              <!-- Dynamically populated by renderStreakHeatmap() in app.js -->
+            </div>
+          </div>
+
+
+          <!-- Shelf: Continue Listening -->
+          <div class="rec-shelf" id="shelf-continue" style="display:none" data-moods="all,focus,night">
+            <div class="rec-shelf-header">
+              <div class="rec-shelf-title-group">
+                <i class="ph-fill ph-play-circle rec-shelf-icon"></i>
+                <div>
+                  <h3 class="rec-shelf-title">Continue Listening</h3>
+                  <p class="rec-shelf-sub">Pick up where you left off</p>
+                </div>
+              </div>
+              <div class="rec-shelf-actions">
+                <span class="rec-source-badge local-badge">Local</span>
+                <div class="rec-shelf-nav-arrows">
+                  <button class="rec-shelf-arrow" data-target="cards-continue" data-dir="-1" title="Scroll left"><i class="ph ph-caret-left"></i></button>
+                  <button class="rec-shelf-arrow" data-target="cards-continue" data-dir="1" title="Scroll right"><i class="ph ph-caret-right"></i></button>
+                </div>
+              </div>
+            </div>
+            <div class="rec-shelf-scroll" id="cards-continue"></div>
+          </div>
+
+          <!-- Shelf: For You — Top Picks -->
+          <div class="rec-shelf" id="shelf-for_you" style="display:none" data-moods="all,chill,discovery">
+            <div class="rec-shelf-header">
+              <div class="rec-shelf-title-group">
+                <i class="ph-fill ph-sparkle rec-shelf-icon"></i>
+                <div>
+                  <h3 class="rec-shelf-title">For You — Top Picks</h3>
+                  <p class="rec-shelf-sub">Curated from your listening habits</p>
+                </div>
+              </div>
+              <div class="rec-shelf-actions">
+                <span class="rec-source-badge local-badge">Local</span>
+                <div class="rec-shelf-nav-arrows">
+                  <button class="rec-shelf-arrow" data-target="cards-for_you" data-dir="-1" title="Scroll left"><i class="ph ph-caret-left"></i></button>
+                  <button class="rec-shelf-arrow" data-target="cards-for_you" data-dir="1" title="Scroll right"><i class="ph ph-caret-right"></i></button>
+                </div>
+              </div>
+            </div>
+            <div class="rec-shelf-scroll" id="cards-for_you"></div>
+          </div>
+
+          <!-- Shelf: Because You Listened (YouTube) -->
+          <div class="rec-shelf" id="shelf-because" style="display:none" data-moods="all,discovery,chill">
+            <div class="rec-shelf-header">
+              <div class="rec-shelf-title-group">
+                <i class="ph-fill ph-music-note rec-shelf-icon"></i>
+                <div>
+                  <h3 class="rec-shelf-title" id="shelf-because-title">Because You Listened to...</h3>
+                  <p class="rec-shelf-sub">Songs inspired by your taste</p>
+                </div>
+              </div>
+              <div class="rec-shelf-actions">
+                <span class="rec-source-badge yt-badge"><i class="ph-fill ph-youtube-logo"></i> YouTube</span>
+                <div class="rec-shelf-nav-arrows">
+                  <button class="rec-shelf-arrow" data-target="cards-because" data-dir="-1" title="Scroll left"><i class="ph ph-caret-left"></i></button>
+                  <button class="rec-shelf-arrow" data-target="cards-because" data-dir="1" title="Scroll right"><i class="ph ph-caret-right"></i></button>
+                </div>
+              </div>
+            </div>
+            <div class="rec-shelf-scroll" id="cards-because"></div>
+          </div>
+
+          <!-- Shelf: Your Most Played -->
+          <div class="rec-shelf" id="shelf-top_played" style="display:none" data-moods="all,energy,focus">
+            <div class="rec-shelf-header">
+              <div class="rec-shelf-title-group">
+                <i class="ph-fill ph-chart-line-up rec-shelf-icon"></i>
+                <div>
+                  <h3 class="rec-shelf-title">Your Most Played</h3>
+                  <p class="rec-shelf-sub">Your personal hall of fame</p>
+                </div>
+              </div>
+              <div class="rec-shelf-actions">
+                <span class="rec-source-badge local-badge">Local</span>
+                <div class="rec-shelf-nav-arrows">
+                  <button class="rec-shelf-arrow" data-target="cards-top_played" data-dir="-1" title="Scroll left"><i class="ph ph-caret-left"></i></button>
+                  <button class="rec-shelf-arrow" data-target="cards-top_played" data-dir="1" title="Scroll right"><i class="ph ph-caret-right"></i></button>
+                </div>
+              </div>
+            </div>
+            <div class="rec-shelf-scroll" id="cards-top_played"></div>
+          </div>
+
+          <!-- Shelf: Favorites Mix -->
+          <div class="rec-shelf" id="shelf-favorites" style="display:none" data-moods="all,chill,night">
+            <div class="rec-shelf-header">
+              <div class="rec-shelf-title-group">
+                <i class="ph-fill ph-star rec-shelf-icon"></i>
+                <div>
+                  <h3 class="rec-shelf-title">Favorites Mix</h3>
+                  <p class="rec-shelf-sub">Songs you've loved over time</p>
+                </div>
+              </div>
+              <div class="rec-shelf-actions">
+                <span class="rec-source-badge local-badge">Local</span>
+                <div class="rec-shelf-nav-arrows">
+                  <button class="rec-shelf-arrow" data-target="cards-favorites" data-dir="-1" title="Scroll left"><i class="ph ph-caret-left"></i></button>
+                  <button class="rec-shelf-arrow" data-target="cards-favorites" data-dir="1" title="Scroll right"><i class="ph ph-caret-right"></i></button>
+                </div>
+              </div>
+            </div>
+            <div class="rec-shelf-scroll" id="cards-favorites"></div>
+          </div>
+
+          <!-- Shelf: Mood Radio (YouTube) -->
+          <div class="rec-shelf" id="shelf-mood" style="display:none" data-moods="all,night,chill,focus">
+            <div class="rec-shelf-header">
+              <div class="rec-shelf-title-group">
+                <i class="ph-fill ph-sun-horizon rec-shelf-icon"></i>
+                <div>
+                  <h3 class="rec-shelf-title" id="shelf-mood-title">Mood Radio</h3>
+                  <p class="rec-shelf-sub">Curated for right now</p>
+                </div>
+              </div>
+              <div class="rec-shelf-actions">
+                <span class="rec-source-badge yt-badge"><i class="ph-fill ph-youtube-logo"></i> YouTube</span>
+                <div class="rec-shelf-nav-arrows">
+                  <button class="rec-shelf-arrow" data-target="cards-mood" data-dir="-1" title="Scroll left"><i class="ph ph-caret-left"></i></button>
+                  <button class="rec-shelf-arrow" data-target="cards-mood" data-dir="1" title="Scroll right"><i class="ph ph-caret-right"></i></button>
+                </div>
+              </div>
+            </div>
+            <div class="rec-shelf-scroll" id="cards-mood"></div>
+          </div>
+
+          <!-- Shelf: Recently Added -->
+          <div class="rec-shelf" id="shelf-recent_added" style="display:none" data-moods="all,discovery">
+            <div class="rec-shelf-header">
+              <div class="rec-shelf-title-group">
+                <i class="ph-fill ph-plus-circle rec-shelf-icon"></i>
+                <div>
+                  <h3 class="rec-shelf-title">Recently Added</h3>
+                  <p class="rec-shelf-sub">Fresh to your collection</p>
+                </div>
+              </div>
+              <div class="rec-shelf-actions">
+                <span class="rec-source-badge local-badge">Local</span>
+                <div class="rec-shelf-nav-arrows">
+                  <button class="rec-shelf-arrow" data-target="cards-recent_added" data-dir="-1" title="Scroll left"><i class="ph ph-caret-left"></i></button>
+                  <button class="rec-shelf-arrow" data-target="cards-recent_added" data-dir="1" title="Scroll right"><i class="ph ph-caret-right"></i></button>
+                </div>
+              </div>
+            </div>
+            <div class="rec-shelf-scroll" id="cards-recent_added"></div>
+          </div>
+
+          <!-- Shelf: Trending Now (YouTube) -->
+          <div class="rec-shelf" id="shelf-trending" style="display:none" data-moods="all,discovery,energy">
+            <div class="rec-shelf-header">
+              <div class="rec-shelf-title-group">
+                <i class="ph-fill ph-fire rec-shelf-icon"></i>
+                <div>
+                  <h3 class="rec-shelf-title">Trending Now</h3>
+                  <p class="rec-shelf-sub">What the world is listening to</p>
+                </div>
+              </div>
+              <div class="rec-shelf-actions">
+                <span class="rec-source-badge yt-badge"><i class="ph-fill ph-youtube-logo"></i> YouTube</span>
+                <div class="rec-shelf-nav-arrows">
+                  <button class="rec-shelf-arrow" data-target="cards-trending" data-dir="-1" title="Scroll left"><i class="ph ph-caret-left"></i></button>
+                  <button class="rec-shelf-arrow" data-target="cards-trending" data-dir="1" title="Scroll right"><i class="ph ph-caret-right"></i></button>
+                </div>
+              </div>
+            </div>
+            <div class="rec-shelf-scroll" id="cards-trending"></div>
+          </div>
+
+          <!-- Shelf: Your Top This Week -->
+          <div class="rec-shelf" id="shelf-this_week" style="display:none" data-moods="all,energy,focus">
+            <div class="rec-shelf-header">
+              <div class="rec-shelf-title-group">
+                <i class="ph-fill ph-calendar-check rec-shelf-icon"></i>
+                <div>
+                  <h3 class="rec-shelf-title">Your Top This Week</h3>
+                  <p class="rec-shelf-sub">Most played in the last 7 days</p>
+                </div>
+              </div>
+              <div class="rec-shelf-actions">
+                <span class="rec-source-badge local-badge">Local</span>
+                <div class="rec-shelf-nav-arrows">
+                  <button class="rec-shelf-arrow" data-target="cards-this_week" data-dir="-1" title="Scroll left"><i class="ph ph-caret-left"></i></button>
+                  <button class="rec-shelf-arrow" data-target="cards-this_week" data-dir="1" title="Scroll right"><i class="ph ph-caret-right"></i></button>
+                </div>
+              </div>
+            </div>
+            <div class="rec-shelf-scroll" id="cards-this_week"></div>
+          </div>
+
+          <!-- Shelf: Hidden Gems -->
+          <div class="rec-shelf" id="shelf-hidden_gems" style="display:none" data-moods="all,chill,discovery">
+            <div class="rec-shelf-header">
+              <div class="rec-shelf-title-group">
+                <i class="ph-fill ph-diamond rec-shelf-icon"></i>
+                <div>
+                  <h3 class="rec-shelf-title">Hidden Gems</h3>
+                  <p class="rec-shelf-sub">Loved once — ready to rediscover</p>
+                </div>
+              </div>
+              <div class="rec-shelf-actions">
+                <span class="rec-source-badge local-badge">Local</span>
+                <div class="rec-shelf-nav-arrows">
+                  <button class="rec-shelf-arrow" data-target="cards-hidden_gems" data-dir="-1" title="Scroll left"><i class="ph ph-caret-left"></i></button>
+                  <button class="rec-shelf-arrow" data-target="cards-hidden_gems" data-dir="1" title="Scroll right"><i class="ph ph-caret-right"></i></button>
+                </div>
+              </div>
+            </div>
+            <div class="rec-shelf-scroll" id="cards-hidden_gems"></div>
+          </div>
+
+          <!-- Shelf: Skip-Free Zone -->
+          <div class="rec-shelf" id="shelf-skip_free" style="display:none" data-moods="all,chill,focus,night">
+            <div class="rec-shelf-header">
+              <div class="rec-shelf-title-group">
+                <i class="ph-fill ph-shield-check rec-shelf-icon"></i>
+                <div>
+                  <h3 class="rec-shelf-title">Skip-Free Zone</h3>
+                  <p class="rec-shelf-sub">Songs you never skip — ever</p>
+                </div>
+              </div>
+              <div class="rec-shelf-actions">
+                <span class="rec-source-badge local-badge">Local</span>
+                <div class="rec-shelf-nav-arrows">
+                  <button class="rec-shelf-arrow" data-target="cards-skip_free" data-dir="-1" title="Scroll left"><i class="ph ph-caret-left"></i></button>
+                  <button class="rec-shelf-arrow" data-target="cards-skip_free" data-dir="1" title="Scroll right"><i class="ph ph-caret-right"></i></button>
+                </div>
+              </div>
+            </div>
+            <div class="rec-shelf-scroll" id="cards-skip_free"></div>
+          </div>
+
+          <!-- Shelf: Rediscover (YouTube) -->
+          <div class="rec-shelf" id="shelf-rediscover" style="display:none" data-moods="all,chill,night,discovery">
+            <div class="rec-shelf-header">
+              <div class="rec-shelf-title-group">
+                <i class="ph-fill ph-clock-clockwise rec-shelf-icon"></i>
+                <div>
+                  <h3 class="rec-shelf-title" id="shelf-rediscover-title">Rediscover</h3>
+                  <p class="rec-shelf-sub">Nostalgic hits & classics you haven't heard in a while</p>
+                </div>
+              </div>
+              <div class="rec-shelf-actions">
+                <span class="rec-source-badge yt-badge"><i class="ph-fill ph-youtube-logo"></i> YouTube</span>
+                <div class="rec-shelf-nav-arrows">
+                  <button class="rec-shelf-arrow" data-target="cards-rediscover" data-dir="-1" title="Scroll left"><i class="ph ph-caret-left"></i></button>
+                  <button class="rec-shelf-arrow" data-target="cards-rediscover" data-dir="1" title="Scroll right"><i class="ph ph-caret-right"></i></button>
+                </div>
+              </div>
+            </div>
+            <div class="rec-shelf-scroll" id="cards-rediscover"></div>
+          </div>
+
+          <!-- Shelf: Because You Played (Markov) -->
+          <div class="rec-shelf" id="shelf-markov_next" style="display:none" data-moods="all,discovery,focus">
+            <div class="rec-shelf-header">
+              <div class="rec-shelf-title-group">
+                <i class="ph-fill ph-graph rec-shelf-icon"></i>
+                <div>
+                  <h3 class="rec-shelf-title" id="shelf-markov-title">Because You Played...</h3>
+                  <p class="rec-shelf-sub">Tracks that naturally follow your last listen</p>
+                </div>
+              </div>
+              <div class="rec-shelf-actions">
+                <span class="rec-source-badge local-badge">Local</span>
+                <div class="rec-shelf-nav-arrows">
+                  <button class="rec-shelf-arrow" data-target="cards-markov_next" data-dir="-1" title="Scroll left"><i class="ph ph-caret-left"></i></button>
+                  <button class="rec-shelf-arrow" data-target="cards-markov_next" data-dir="1" title="Scroll right"><i class="ph ph-caret-right"></i></button>
+                </div>
+              </div>
+            </div>
+            <div class="rec-shelf-scroll" id="cards-markov_next"></div>
+          </div>
+
+          <!-- Skeleton state (shown while loading) -->
+          <div id="rec-skeleton" class="rec-skeleton-wrapper">
+            <div class="rec-skeleton-shelf">
+              <div class="rec-skeleton-title-row">
+                <div class="rec-skeleton-line w-40"></div>
+                <div class="rec-skeleton-line w-20"></div>
+              </div>
+              <div class="rec-skeleton-cards">
+                <div class="rec-skeleton-card"></div>
+                <div class="rec-skeleton-card"></div>
+                <div class="rec-skeleton-card"></div>
+                <div class="rec-skeleton-card"></div>
+                <div class="rec-skeleton-card"></div>
+              </div>
+            </div>
+            <div class="rec-skeleton-shelf">
+              <div class="rec-skeleton-title-row">
+                <div class="rec-skeleton-line w-40"></div>
+                <div class="rec-skeleton-line w-20"></div>
+              </div>
+              <div class="rec-skeleton-cards">
+                <div class="rec-skeleton-card"></div>
+                <div class="rec-skeleton-card"></div>
+                <div class="rec-skeleton-card"></div>
+                <div class="rec-skeleton-card"></div>
+                <div class="rec-skeleton-card"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty state (shown when no data and not loading) -->
+          <div id="rec-empty" class="rec-empty-state" style="display:none">
+            <i class="ph ph-music-notes rec-empty-icon"></i>
+            <p>Play some songs to get personalized recommendations!</p>
+            <p class="rec-empty-sub">Your taste profile builds as you listen.</p>
+          </div>
+
+        </div>
+
+
+        <!-- Local Music Quick Access Bar -->
+        <div class="section-heading" style="margin-top:32px;">
+          <div>
+            <p class="eyebrow">SAVED MEDIA</p>
+            <h2 id="view-title">Downloaded & Local Collection</h2>
+            <p class="muted" id="library-status">Loading tracks...</p>
+          </div>
+          <div class="heading-actions">
+            <button class="btn-secondary" id="rescan"><i class="ph ph-arrows-clockwise"></i> Rescan</button>
+          </div>
+        </div>
+        
+        <div class="category-bar" id="category-bar"></div>
+        <div class="track-table" id="track-list"></div>
+        
+        <div class="empty-state hidden" id="empty-state">
+          <i class="ph ph-music-notes-plus empty-icon"></i>
+          <h3>Quiet in here.</h3>
+          <p>Import a folder or download media to start your collection.</p>
+          <button class="btn-primary" id="empty-import"><i class="ph ph-folder-plus"></i> Import folder</button>
+        </div>
+      </div>
+
+      <!-- View: Explore (YouTube Online Search & Discovery) -->
+      <div id="explore-view" class="view hidden">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">ONLINE DISCOVERY</p>
+            <h2>Explore & Search YouTube</h2>
+            <p class="muted">Search any song, artist or video worldwide and download in 1-click</p>
+          </div>
+        </div>
+
+        <div class="explore-search-bar">
+          <i class="ph ph-magnifying-glass explore-search-icon"></i>
+          <input type="text" id="explore-input" placeholder="Search YouTube for songs, artists, lofi, anime OSTs..." autocomplete="off">
+          <button class="btn-primary" id="explore-submit-btn"><i class="ph ph-arrow-right"></i> Search</button>
+        </div>
+
+        <div class="explore-quick-tags">
+          <span class="explore-tag" data-q="Trending English Pop Hits 2024">🔥 Pop Hits</span>
+          <span class="explore-tag" data-q="Lofi Hip Hop Chill Beats To Relax">☕ Lofi Chill</span>
+          <span class="explore-tag" data-q="Bollywood Superhits 2024">✨ Bollywood</span>
+          <span class="explore-tag" data-q="Punjabi Top Hits 2024">⚡ Punjabi</span>
+          <span class="explore-tag" data-q="Synthwave Chillwave Cyberpunk">🌆 Synthwave</span>
+          <span class="explore-tag" data-q="Anime OST Epic Soundtracks">⚔️ Anime OSTs</span>
+          <span class="explore-tag" data-q="EDM Festival Drops">🎧 EDM</span>
+        </div>
+
+        <!-- Daily Musical Reflection Card -->
+        <div class="explore-quote-card" id="explore-quote-card">
+          <div class="explore-quote-glow"></div>
+          <div class="explore-quote-icon"><i class="ph-fill ph-quotes"></i></div>
+          <div class="explore-quote-content">
+            <span class="explore-quote-badge"><i class="ph-fill ph-sparkle"></i> THOUGHT FOR TODAY</span>
+            <p class="explore-quote-text" id="explore-quote-text">“Where words fail, music speaks.”</p>
+            <cite class="explore-quote-author" id="explore-quote-author">— Hans Christian Andersen</cite>
+          </div>
+          <button type="button" class="explore-quote-refresh-btn" id="explore-quote-refresh-btn" title="Discover another reflection">
+            <i class="ph-bold ph-shuffle"></i>
+          </button>
+        </div>
+
+        <div id="explore-loading" class="explore-loading-state hidden">
+          <i class="ph ph-spinner-gap spinning"></i>
+          <p>Searching YouTube worldwide...</p>
+        </div>
+
+        <div id="explore-results" class="explore-grid"></div>
+
+        <div id="explore-load-more" class="explore-load-more hidden">
+          <button id="explore-load-more-btn" class="btn-load-more">
+            <i class="ph ph-arrow-down"></i>
+            <span>Load More</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- View: Videos -->
+      <div id="videos-view" class="view hidden">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">VISUALS</p>
+            <h2>Videos</h2>
+            <p class="muted" id="videos-status">0 videos</p>
+          </div>
+          <div class="heading-actions">
+            <button class="btn-primary" id="download-video-button"><i class="ph ph-download-simple"></i> Download video</button>
+          </div>
+        </div>
+        <div class="video-grid" id="video-grid"></div>
+        <div class="empty-state hidden" id="empty-videos-state">
+          <i class="ph ph-film-strip empty-icon"></i>
+          <h3>No visual media.</h3>
+          <p>Download video links to watch them here.</p>
+          <button class="btn-primary" id="empty-video-import"><i class="ph ph-link"></i> Download</button>
+        </div>
+      </div>
+
+      <!-- View: Playlists -->
+      <div id="playlists-view" class="view hidden">
+        <!-- 1. Playlists Grid Overview -->
+        <div id="playlists-overview">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">CURATION</p>
+              <h2>Playlists</h2>
+              <p class="muted">Your curated selections</p>
+            </div>
+            <div class="heading-actions">
+              <button class="btn-secondary" id="import-yt-playlist-btn" style="display:inline-flex;align-items:center;gap:6px;"><i class="ph-fill ph-youtube-logo" style="color:#ff4444;"></i> Import YouTube Playlist</button>
+              <button class="btn-primary" id="new-playlist"><i class="ph ph-plus"></i> Create Playlist</button>
+            </div>
+          </div>
+          <div class="playlist-grid" id="playlist-list"></div>
+        </div>
+
+        <!-- 2. Single Playlist Details View -->
+        <div id="playlist-detail-view" class="hidden">
+          <div class="playlist-detail-header">
+            <button class="round-action" id="playlist-back-btn" title="Back to All Playlists"><i class="ph ph-arrow-left"></i></button>
+            <div class="playlist-detail-cover" id="playlist-detail-cover">
+              <i class="ph-fill ph-playlist"></i>
+            </div>
+            <div class="playlist-detail-meta">
+              <p class="eyebrow" style="margin:0;">PLAYLIST</p>
+              <h1 id="playlist-detail-title" class="playlist-detail-title">Playlist Title</h1>
+              <p class="muted" id="playlist-detail-stats">0 tracks · 0 min</p>
+              <div class="playlist-detail-actions">
+                <button class="btn-primary" id="playlist-detail-play"><i class="ph-fill ph-play-circle"></i> Play</button>
+                <button class="btn-secondary" id="playlist-detail-shuffle"><i class="ph ph-shuffle"></i> Shuffle</button>
+                <button class="btn-secondary btn-danger-hover" id="playlist-detail-delete"><i class="ph ph-trash"></i> Delete</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="track-table" id="playlist-track-list"></div>
+          
+          <div class="empty-state hidden" id="playlist-detail-empty" style="padding: 60px 20px;">
+            <i class="ph-fill ph-music-notes-plus empty-icon" style="color:var(--accent);font-size:44px;"></i>
+            <h3>This playlist is empty.</h3>
+            <p>Add songs from your library or currently playing track using the <i class="ph ph-plus-circle"></i> icon.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- View: Favorites -->
+      <div id="favorites-view" class="view hidden">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">LOVED</p>
+            <h2>Favorites</h2>
+            <p class="muted">Tracks close to the heart</p>
+          </div>
+        </div>
+        <div class="track-table" id="favorite-list"></div>
+      </div>
+
+      <!-- View: Lyrics -->
+      <div id="lyrics-view" class="view hidden">
+        <div class="lyrics-page" id="lyrics-page">
+          <div class="lyrics-header-row">
+            <div>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <p class="eyebrow" style="margin:0;">POETRY & KARAOKE</p>
+                <span id="lyrics-source-badge" class="lyrics-source-badge hidden">LRCLIB (Synced)</span>
+              </div>
+              <h3 id="lyrics-title">Nothing playing</h3>
+              <p class="muted" id="lyrics-artist">-</p>
+            </div>
+            <div class="lyrics-mode-toggles">
+              <button class="type-btn active" id="lyrics-tab-karaoke"><i class="ph ph-microphone-stage"></i> Live Karaoke</button>
+              <button class="type-btn" id="open-lyrics-search-btn"><i class="ph ph-magnifying-glass"></i> Search Lyrics</button>
+              <button class="type-btn" id="lyrics-tab-editor"><i class="ph ph-pencil-simple"></i> Edit</button>
+            </div>
+          </div>
+          
+          <div class="karaoke-live-stage" id="karaoke-live-stage">
+            <div class="karaoke-lines-container" id="karaoke-lines-container">
+              <p class="karaoke-empty">Play a song to stream live synchronized lyrics.</p>
+            </div>
+          </div>
+          
+          <div class="lyrics-editor-wrap hidden" id="lyrics-editor-wrap">
+            <div style="display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap;">
+              <button class="btn-secondary" id="fetch-lyrics-btn"><i class="ph ph-arrows-clockwise"></i> Auto-fetch</button>
+              <button class="btn-secondary" id="search-lyrics-btn-edit"><i class="ph ph-magnifying-glass"></i> Search online</button>
+              <button class="btn-primary" id="save-lyrics"><i class="ph ph-floppy-disk"></i> Save lyrics</button>
+            </div>
+            <textarea class="lyrics-editor" id="lyrics-editor" placeholder="Lyrics will appear here..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- View: Downloads -->
+      <div id="downloads-view" class="view hidden">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">ACTIVITY</p>
+            <h2>Downloads</h2>
+            <p class="muted" id="downloads-count">0 tasks</p>
+          </div>
+          <div class="heading-actions">
+            <button class="btn-secondary" id="refresh-downloads"><i class="ph ph-arrows-clockwise"></i> Refresh</button>
+          </div>
+        </div>
+        <div class="downloads-list" id="downloads-list"></div>
+      </div>
+
+      <!-- View: DJ Remix Studio -->
+      <div id="dj-studio-view" class="view hidden">
+        <div class="dj-studio-container">
+          <!-- Top Bar -->
+          <div class="dj-top-bar">
+            <div class="dj-logo-group">
+              <i class="ph-fill ph-disc dj-logo-icon"></i>
+              <div class="dj-title">DJ Remix Studio</div>
+              <span class="dj-badge">Dual Deck Pro Console</span>
+            </div>
+            <div class="dj-top-controls">
+              <div class="dj-midi-pill" id="dj-midi-pill" title="MIDI Controller Status">
+                <span class="dj-midi-dot"></span>
+                <span>Web MIDI</span>
+              </div>
+              <button class="dj-rec-btn" id="dj-rec-btn" title="Record Live DJ Set to WAV/WebM">
+                <span class="rec-dot"></span>
+                <span class="rec-text">REC ●</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Console Grid: Deck A - Central Mixer - Deck B -->
+          <div class="dj-console-grid">
+            <!-- DECK A -->
+            <div class="dj-deck-card dj-deck-a">
+              <div class="deck-header">
+                <div class="deck-identity">
+                  <span class="deck-badge">DECK A</span>
+                  <div class="deck-track-meta">
+                    <div class="deck-track-title" id="track-title-a">No Track Loaded</div>
+                    <div class="deck-track-artist" id="track-artist-a">Click Load to select audio</div>
+                  </div>
+                </div>
+                <button class="deck-load-btn" id="btn-load-a"><i class="ph-bold ph-folder-open"></i> Load</button>
+              </div>
+
+              <!-- Scrolling Waveform -->
+              <div class="deck-waveform-wrapper">
+                <canvas class="deck-waveform-canvas" id="waveform-canvas-a"></canvas>
+                <div class="waveform-time-display">
+                  <span id="time-a">0:00 / 0:00</span>
+                  <span class="waveform-bpm-tag" id="bpm-val-a">124.0 BPM (0.0%)</span>
+                </div>
+              </div>
+
+              <!-- Jogwheel & Pitch Strip -->
+              <div class="deck-center-row">
+                <div class="jogwheel-box" id="jogwheel-a" title="Click & drag to scratch / scrub">
+                  <canvas class="jogwheel-canvas" id="jogwheel-canvas-a"></canvas>
+                </div>
+                <div class="deck-pitch-strip">
+                  <div class="pitch-label-row">
+                    <span>TEMPO</span>
+                    <span class="pitch-reset-btn" id="pitch-reset-a" title="Reset tempo to 100%">RESET</span>
+                  </div>
+                  <input type="range" class="pitch-slider-vertical" id="pitch-a" min="0" max="100" value="50">
+                  <div class="pitch-bend-group">
+                    <button class="pitch-nudge-btn" id="pitch-nudge-down-a" title="Pitch Nudge -">◀ BEND</button>
+                    <button class="pitch-nudge-btn" id="pitch-nudge-up-a" title="Pitch Nudge +">BEND ▶</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Transport Controls -->
+              <div class="deck-transport-row">
+                <button class="transport-btn btn-play" id="play-a"><i class="ph-bold ph-play"></i> PLAY</button>
+                <button class="transport-btn btn-cue" id="cue-a"><i class="ph-bold ph-stop"></i> CUE</button>
+                <button class="transport-btn btn-sync" id="sync-a"><i class="ph-bold ph-arrows-merge"></i> SYNC</button>
+              </div>
+
+              <!-- Hot Cues & Loops -->
+              <div class="deck-pads-section">
+                <div class="pads-label-row">
+                  <span>HOT CUES (1-4)</span>
+                  <span style="font-size:10px;opacity:0.7;">Shift+Click Clear</span>
+                </div>
+                <div class="hot-cues-grid">
+                  <button class="cue-pad-btn" id="cue-a-1"><span>1</span><span class="cue-pad-time">EMPTY</span></button>
+                  <button class="cue-pad-btn" id="cue-a-2"><span>2</span><span class="cue-pad-time">EMPTY</span></button>
+                  <button class="cue-pad-btn" id="cue-a-3"><span>3</span><span class="cue-pad-time">EMPTY</span></button>
+                  <button class="cue-pad-btn" id="cue-a-4"><span>4</span><span class="cue-pad-time">EMPTY</span></button>
+                </div>
+                <div class="pads-label-row" style="margin-top:4px;">
+                  <span>AUTO LOOP</span>
+                </div>
+                <div class="loop-grid">
+                  <button class="loop-btn loop-btn-a" data-beats="0.5">1/2</button>
+                  <button class="loop-btn loop-btn-a" data-beats="1">1</button>
+                  <button class="loop-btn loop-btn-a" data-beats="2">2</button>
+                  <button class="loop-btn loop-btn-a" data-beats="4">4</button>
+                  <button class="loop-btn loop-btn-a" data-beats="0">EXIT</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- CENTRAL 2-CHANNEL MIXER -->
+            <div class="dj-mixer-card">
+              <div class="mixer-header-row">
+                <span class="mixer-label">PRO MIXER</span>
+                <div class="mixer-master-knob-box">
+                  <span class="dj-knob-label">MASTER</span>
+                  <input type="range" id="master-vol-knob" min="0" max="1.5" step="0.05" value="1.0" style="width:70px;cursor:pointer;">
+                </div>
+              </div>
+
+              <div class="mixer-channels-grid">
+                <!-- Channel A Strip -->
+                <div class="mixer-channel-strip">
+                  <span class="ch-badge" style="color:#00e5ff;">CH 1 (A)</span>
+                  <!-- Trim -->
+                  <div class="dj-knob-container">
+                    <div class="dj-knob-dial" id="knob-trim-a"><div class="dj-knob-pointer"></div></div>
+                    <span class="dj-knob-label">TRIM</span>
+                  </div>
+                  <!-- High -->
+                  <div class="dj-knob-container">
+                    <div class="dj-knob-dial" id="knob-hi-a"><div class="dj-knob-pointer"></div></div>
+                    <span class="dj-knob-label">HI</span>
+                    <button class="eq-kill-btn" id="kill-high-a">KILL</button>
+                  </div>
+                  <!-- Mid -->
+                  <div class="dj-knob-container">
+                    <div class="dj-knob-dial" id="knob-mid-a"><div class="dj-knob-pointer"></div></div>
+                    <span class="dj-knob-label">MID</span>
+                    <button class="eq-kill-btn" id="kill-mid-a">KILL</button>
+                  </div>
+                  <!-- Low -->
+                  <div class="dj-knob-container">
+                    <div class="dj-knob-dial" id="knob-low-a"><div class="dj-knob-pointer"></div></div>
+                    <span class="dj-knob-label">LOW</span>
+                    <button class="eq-kill-btn" id="kill-low-a">KILL</button>
+                  </div>
+                  <!-- Filter -->
+                  <div class="dj-knob-container dj-filter-knob">
+                    <div class="dj-knob-dial" id="knob-filter-a"><div class="dj-knob-pointer"></div></div>
+                    <span class="dj-knob-label">FILTER</span>
+                  </div>
+                  <!-- Upfader & VU Meter -->
+                  <div class="fader-vu-group">
+                    <input type="range" orient="vertical" class="channel-upfader-vertical" id="upfader-a" min="0" max="1" step="0.02" value="1">
+                    <div class="vu-meter-ladder" id="vu-meter-a">
+                      <div class="vu-segment"></div><div class="vu-segment"></div>
+                      <div class="vu-segment"></div><div class="vu-segment"></div>
+                      <div class="vu-segment"></div><div class="vu-segment"></div>
+                      <div class="vu-segment"></div><div class="vu-segment"></div>
+                      <div class="vu-segment"></div><div class="vu-segment"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Channel B Strip -->
+                <div class="mixer-channel-strip">
+                  <span class="ch-badge" style="color:#ff007f;">CH 2 (B)</span>
+                  <!-- Trim -->
+                  <div class="dj-knob-container">
+                    <div class="dj-knob-dial dj-deck-b-knob" id="knob-trim-b"><div class="dj-knob-pointer"></div></div>
+                    <span class="dj-knob-label">TRIM</span>
+                  </div>
+                  <!-- High -->
+                  <div class="dj-knob-container">
+                    <div class="dj-knob-dial dj-deck-b-knob" id="knob-hi-b"><div class="dj-knob-pointer"></div></div>
+                    <span class="dj-knob-label">HI</span>
+                    <button class="eq-kill-btn" id="kill-high-b">KILL</button>
+                  </div>
+                  <!-- Mid -->
+                  <div class="dj-knob-container">
+                    <div class="dj-knob-dial dj-deck-b-knob" id="knob-mid-b"><div class="dj-knob-pointer"></div></div>
+                    <span class="dj-knob-label">MID</span>
+                    <button class="eq-kill-btn" id="kill-mid-b">KILL</button>
+                  </div>
+                  <!-- Low -->
+                  <div class="dj-knob-container">
+                    <div class="dj-knob-dial dj-deck-b-knob" id="knob-low-b"><div class="dj-knob-pointer"></div></div>
+                    <span class="dj-knob-label">LOW</span>
+                    <button class="eq-kill-btn" id="kill-low-b">KILL</button>
+                  </div>
+                  <!-- Filter -->
+                  <div class="dj-knob-container dj-filter-knob">
+                    <div class="dj-knob-dial dj-deck-b-knob" id="knob-filter-b"><div class="dj-knob-pointer"></div></div>
+                    <span class="dj-knob-label">FILTER</span>
+                  </div>
+                  <!-- Upfader & VU Meter -->
+                  <div class="fader-vu-group">
+                    <input type="range" orient="vertical" class="channel-upfader-vertical" id="upfader-b" min="0" max="1" step="0.02" value="1">
+                    <div class="vu-meter-ladder" id="vu-meter-b">
+                      <div class="vu-segment"></div><div class="vu-segment"></div>
+                      <div class="vu-segment"></div><div class="vu-segment"></div>
+                      <div class="vu-segment"></div><div class="vu-segment"></div>
+                      <div class="vu-segment"></div><div class="vu-segment"></div>
+                      <div class="vu-segment"></div><div class="vu-segment"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Crossfader Strip -->
+              <div class="crossfader-section">
+                <div class="crossfader-top-row">
+                  <span class="crossfader-label">CROSSFADER</span>
+                  <select class="crossfader-curve-select" id="crossfader-curve-select">
+                    <option value="smooth">Smooth (Equal Power)</option>
+                    <option value="linear">Linear</option>
+                    <option value="scratch">Scratch Cut (Turntable)</option>
+                  </select>
+                </div>
+                <input type="range" class="crossfader-slider" id="dj-crossfader" min="-1" max="1" step="0.02" value="0">
+                <div class="crossfader-labels-row">
+                  <span class="cf-label-a">DECK A</span>
+                  <span style="color:#64748b;font-size:10px;">CENTER (X)</span>
+                  <span class="cf-label-b">DECK B</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- DECK B -->
+            <div class="dj-deck-card dj-deck-b">
+              <div class="deck-header">
+                <div class="deck-identity">
+                  <span class="deck-badge">DECK B</span>
+                  <div class="deck-track-meta">
+                    <div class="deck-track-title" id="track-title-b">No Track Loaded</div>
+                    <div class="deck-track-artist" id="track-artist-b">Click Load to select audio</div>
+                  </div>
+                </div>
+                <button class="deck-load-btn" id="btn-load-b"><i class="ph-bold ph-folder-open"></i> Load</button>
+              </div>
+
+              <!-- Scrolling Waveform -->
+              <div class="deck-waveform-wrapper">
+                <canvas class="deck-waveform-canvas" id="waveform-canvas-b"></canvas>
+                <div class="waveform-time-display">
+                  <span id="time-b">0:00 / 0:00</span>
+                  <span class="waveform-bpm-tag" id="bpm-val-b" style="color:#f472b6;background:rgba(244,114,182,0.12);">124.0 BPM (0.0%)</span>
+                </div>
+              </div>
+
+              <!-- Jogwheel & Pitch Strip -->
+              <div class="deck-center-row">
+                <div class="jogwheel-box" id="jogwheel-b" title="Click & drag to scratch / scrub">
+                  <canvas class="jogwheel-canvas" id="jogwheel-canvas-b"></canvas>
+                </div>
+                <div class="deck-pitch-strip">
+                  <div class="pitch-label-row">
+                    <span>TEMPO</span>
+                    <span class="pitch-reset-btn" id="pitch-reset-b" title="Reset tempo to 100%">RESET</span>
+                  </div>
+                  <input type="range" class="pitch-slider-vertical" id="pitch-b" min="0" max="100" value="50">
+                  <div class="pitch-bend-group">
+                    <button class="pitch-nudge-btn" id="pitch-nudge-down-b" title="Pitch Nudge -">◀ BEND</button>
+                    <button class="pitch-nudge-btn" id="pitch-nudge-up-b" title="Pitch Nudge +">BEND ▶</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Transport Controls -->
+              <div class="deck-transport-row">
+                <button class="transport-btn btn-play" id="play-b"><i class="ph-bold ph-play"></i> PLAY</button>
+                <button class="transport-btn btn-cue" id="cue-b"><i class="ph-bold ph-stop"></i> CUE</button>
+                <button class="transport-btn btn-sync" id="sync-b"><i class="ph-bold ph-arrows-merge"></i> SYNC</button>
+              </div>
+
+              <!-- Hot Cues & Loops -->
+              <div class="deck-pads-section">
+                <div class="pads-label-row">
+                  <span>HOT CUES (1-4)</span>
+                  <span style="font-size:10px;opacity:0.7;">Shift+Click Clear</span>
+                </div>
+                <div class="hot-cues-grid">
+                  <button class="cue-pad-btn" id="cue-b-1"><span>1</span><span class="cue-pad-time">EMPTY</span></button>
+                  <button class="cue-pad-btn" id="cue-b-2"><span>2</span><span class="cue-pad-time">EMPTY</span></button>
+                  <button class="cue-pad-btn" id="cue-b-3"><span>3</span><span class="cue-pad-time">EMPTY</span></button>
+                  <button class="cue-pad-btn" id="cue-b-4"><span>4</span><span class="cue-pad-time">EMPTY</span></button>
+                </div>
+                <div class="pads-label-row" style="margin-top:4px;">
+                  <span>AUTO LOOP</span>
+                </div>
+                <div class="loop-grid">
+                  <button class="loop-btn loop-btn-b" data-beats="0.5">1/2</button>
+                  <button class="loop-btn loop-btn-b" data-beats="1">1</button>
+                  <button class="loop-btn loop-btn-b" data-beats="2">2</button>
+                  <button class="loop-btn loop-btn-b" data-beats="4">4</button>
+                  <button class="loop-btn loop-btn-b" data-beats="0">EXIT</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Performance Strip: Master FX Rack & Sampler Pads -->
+          <div class="dj-bottom-strip">
+            <!-- Master FX Rack -->
+            <div class="dj-card-panel">
+              <div class="panel-title-row">
+                <span class="panel-title"><i class="ph-fill ph-waveform"></i> Master DSP Effects</span>
+              </div>
+              <div class="fx-buttons-row">
+                <button class="fx-select-btn" data-fx="echo">ECHO / DELAY</button>
+                <button class="fx-select-btn" data-fx="reverb">SPACE REVERB</button>
+                <button class="fx-select-btn" data-fx="flanger">JET FLANGER</button>
+              </div>
+              <div class="fx-parameters-row">
+                <div class="fx-beats-group">
+                  <button class="fx-beat-btn" data-fraction="0.25">1/4 Beat</button>
+                  <button class="fx-beat-btn active" data-fraction="0.5">1/2 Beat</button>
+                  <button class="fx-beat-btn" data-fraction="1">1 Beat</button>
+                </div>
+                <div class="fx-wetdry-group">
+                  <span>WET / DRY</span>
+                  <input type="range" class="fx-wetdry-slider" id="fx-wetdry" min="0" max="1" step="0.05" value="0.35">
+                </div>
+              </div>
+            </div>
+
+            <!-- Sampler Soundboard -->
+            <div class="dj-card-panel">
+              <div class="panel-title-row">
+                <span class="panel-title"><i class="ph-fill ph-speaker-simple-high"></i> Performance Drops (Keys 1-6)</span>
+              </div>
+              <div class="sampler-pads-grid">
+                <button class="sample-pad-btn" data-sample="airhorn">
+                  <span class="sample-pad-icon">📢</span>
+                  <span>Airhorn</span>
+                </button>
+                <button class="sample-pad-btn" data-sample="laser">
+                  <span class="sample-pad-icon">🔫</span>
+                  <span>Laser</span>
+                </button>
+                <button class="sample-pad-btn" data-sample="siren">
+                  <span class="sample-pad-icon">🚨</span>
+                  <span>Dub Siren</span>
+                </button>
+                <button class="sample-pad-btn" data-sample="drop">
+                  <span class="sample-pad-icon">💥</span>
+                  <span>Sub Drop</span>
+                </button>
+                <button class="sample-pad-btn" data-sample="clap">
+                  <span class="sample-pad-icon">👏</span>
+                  <span>808 Clap</span>
+                </button>
+                <button class="sample-pad-btn" data-sample="scratch">
+                  <span class="sample-pad-icon">💿</span>
+                  <span>Scratch</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Track Picker Modal -->
+        <div class="dj-modal-backdrop hidden" id="dj-track-modal">
+          <div class="dj-modal-card">
+            <div class="dj-modal-header">
+              <div class="dj-modal-title">Load Audio to <span id="dj-modal-deck-badge" style="color:#38bdf8;">Deck</span></div>
+              <button class="dj-modal-close-btn" id="dj-modal-close"><i class="ph ph-x"></i></button>
+            </div>
+            <div class="dj-modal-search">
+              <input type="search" id="dj-modal-search-input" placeholder="Search track by title, artist, or album...">
+            </div>
+            <div class="dj-modal-list" id="dj-modal-list"></div>
+          </div>
+        </div>
+      </div>
+      
+    </main>
+  </div>
+
+  <!-- Player Bar -->
+  <div class="player-bar">
+    <div class="now-playing">
+      <div class="now-art" id="now-art"><i class="ph-fill ph-music-note"></i></div>
+      <div class="now-info">
+        <strong id="now-title">Not playing</strong>
+        <span id="now-artist">-</span>
+      </div>
+      <div class="now-actions">
+        <button class="now-action-btn" id="now-start-radio-btn" title="Start Radio from this track"><i class="ph-bold ph-radio"></i></button>
+        <button class="now-action-btn" id="now-add-playlist" title="Add currently playing to playlist"><i class="ph ph-plus-circle"></i></button>
+        <button class="now-action-btn" id="now-fav-btn" title="Favorite"><i class="ph ph-star"></i></button>
+      </div>
+    </div>
+    
+    <div class="player-controls">
+      <div class="control-buttons">
+        <button class="ctrl-btn" id="shuffle-btn"><i class="ph ph-shuffle"></i></button>
+        <button class="ctrl-btn" id="previous"><i class="ph-fill ph-skip-back"></i></button>
+        <button class="ctrl-play" id="play"><i class="ph-fill ph-play"></i></button>
+        <button class="ctrl-btn" id="next"><i class="ph-fill ph-skip-forward"></i></button>
+        <button class="ctrl-btn" id="repeat-btn"><i class="ph ph-repeat"></i></button>
+        <button class="ctrl-btn" id="autodj-quick-btn" title="Toggle Smart Auto-DJ Beat-Matched Crossfader (D)"><i class="ph-fill ph-headphones"></i></button>
+      </div>
+      <div class="timeline">
+        <span id="current-time">0:00</span>
+        <input type="range" id="progress" min="0" max="100" value="0">
+        <span id="total-time">0:00</span>
+      </div>
+    </div>
+    
+    <div class="player-actions">
+      <!-- Studio FX Popover Launcher -->
+      <div class="fx-launcher-wrapper">
+        <button class="player-fx-btn" id="fx-launcher-btn" title="Audio Studio & Enhancers">
+          <i class="ph-fill ph-sparkle"></i>
+          <span>FX</span>
+        </button>
+
+        <!-- Floating Quick FX Menu -->
+        <div class="studio-fx-popover" id="studio-fx-popover">
+          <div class="fx-popover-header">
+            <span class="eyebrow" style="margin:0;">AUDIO SUITE</span>
+          </div>
+          <div class="fx-popover-list">
+            <button class="fx-popover-item" id="norm-toggle-btn" title="Toggle Smart Gain Audio Normalization">
+              <div class="fx-item-icon"><i class="ph-bold ph-waveform"></i></div>
+              <div class="fx-item-meta">
+                <div class="norm-header-row">
+                  <strong>Smart Gain</strong>
+                  <span class="norm-status-pill on" id="norm-status-badge">ON</span>
+                </div>
+                <span id="norm-status-sub">Consistent loudness across tracks</span>
+              </div>
+            </button>
+            <button class="fx-popover-item" id="hover-preview-toggle-btn" title="Toggle 20-Second Audio Preview Buttons">
+              <div class="fx-item-icon"><i class="ph-bold ph-speaker-simple-high"></i></div>
+              <div class="fx-item-meta">
+                <div class="norm-header-row">
+                  <strong>20s Audio Preview</strong>
+                  <span class="norm-status-pill on" id="hover-preview-status-badge">ON</span>
+                </div>
+                <span id="hover-preview-status-sub">Dedicated 20s preview buttons on songs</span>
+              </div>
+            </button>
+            <button class="fx-popover-item" id="chameleon-toggle-btn" title="Toggle Dynamic Artwork Color Extraction">
+              <div class="fx-item-icon"><i class="ph-bold ph-palette"></i></div>
+              <div class="fx-item-meta">
+                <div class="norm-header-row">
+                  <strong>Chameleon Glow</strong>
+                  <span class="norm-status-pill on" id="chameleon-status-badge">ON</span>
+                </div>
+                <span id="chameleon-status-sub">Dynamic UI glow from album art</span>
+              </div>
+            </button>
+            <button class="fx-popover-item" id="karaoke-toggle-btn" title="Toggle Instant Vocal Remover / Karaoke DSP">
+              <div class="fx-item-icon"><i class="ph-bold ph-microphone-slash"></i></div>
+              <div class="fx-item-meta">
+                <div class="norm-header-row">
+                  <strong>Karaoke Mode</strong>
+                  <span class="norm-status-pill off" id="karaoke-status-badge">OFF</span>
+                </div>
+                <span id="karaoke-status-sub">Real-time vocal suppression for singing</span>
+              </div>
+            </button>
+            <button class="fx-popover-item" id="ambient-toggle-btn">
+              <div class="fx-item-icon"><i class="ph ph-cloud-rain"></i></div>
+              <div class="fx-item-meta">
+                <strong>Atmosphere & Sleep</strong>
+                <span>Rain, fireplace & timer</span>
+              </div>
+            </button>
+            <button class="fx-popover-item" id="eq-toggle-btn">
+              <div class="fx-item-icon"><i class="ph ph-sliders"></i></div>
+              <div class="fx-item-meta">
+                <strong>10-Band Equalizer</strong>
+                <span>8D Audio & sub-bass boost</span>
+              </div>
+            </button>
+            <button class="fx-popover-item" id="autodj-toggle-btn" title="Cycle Smart Auto-DJ Crossfade Modes">
+              <div class="fx-item-icon"><i class="ph-bold ph-headphones"></i></div>
+              <div class="fx-item-meta">
+                <div class="norm-header-row">
+                  <strong>Smart Auto-DJ</strong>
+                  <span class="norm-status-pill on" id="autodj-status-badge">4s DJ</span>
+                </div>
+                <span id="autodj-status-sub">Beat-matched equal-power blends</span>
+              </div>
+            </button>
+            <button class="fx-popover-item" id="pip-btn">
+              <div class="fx-item-icon"><i class="ph ph-picture-in-picture"></i></div>
+              <div class="fx-item-meta">
+                <strong>Desktop Mini Player</strong>
+                <span>Picture-in-Picture window</span>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <button class="ctrl-btn" id="playback-speed-btn" title="Playback Speed" style="font-size:11px;font-weight:700;letter-spacing:0.5px;min-width:32px;display:flex;align-items:center;justify-content:center;">1x</button>
+      <button class="ctrl-btn" id="queue-toggle" title="Queue"><i class="ph ph-list-dashes"></i></button>
+      <button class="ctrl-btn" id="fs-expand-btn" title="Expand Full Screen"><i class="ph ph-arrows-out"></i></button>
+
+      <!-- Expandable Volume Capsule -->
+      <div class="volume-capsule" id="volume-capsule">
+        <button class="vol-icon-btn" id="vol-mute-btn" title="Mute / Unmute">
+          <i class="ph ph-speaker-high" id="vol-icon"></i>
+        </button>
+        <div class="volume-slider-track">
+          <input type="range" id="volume" min="0" max="1" step="0.05" value="1">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Queue Drawer -->
+  <div class="queue-drawer" id="queue-drawer">
+    <div class="queue-header">
+      <h2>Up next</h2>
+      <button class="round-action" id="queue-close"><i class="ph ph-x"></i></button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:12px;">
+      <button class="btn-secondary" id="queue-shuffle-btn" style="flex:1;padding:6px 10px;font-size:12px;"><i class="ph ph-shuffle"></i> Shuffle</button>
+      <button class="btn-secondary" id="queue-vibe-compass-btn" style="flex:1;padding:6px 10px;font-size:12px;" title="Open 2D Vibe Compass"><i class="ph-bold ph-compass"></i> Vibe</button>
+      <button class="btn-secondary" id="queue-clear-btn" style="flex:1;padding:6px 10px;font-size:12px;"><i class="ph ph-trash"></i> Clear</button>
+    </div>
+    <div class="queue-list" id="queue-list"></div>
+    <button id="queue-open-inline" class="hidden"></button>
+    <!-- Used by JS for random layout rendering -->
+    <div id="album-ribbon" class="hidden"></div> 
+  </div>
+
+  <!-- Manage Folders Dialog -->
+  <dialog id="folders-sheet">
+    <div class="dialog-header">
+      <div><p class="eyebrow">LIBRARY</p><h2>Manage Folders</h2></div>
+      <button class="round-action" id="folders-close"><i class="ph ph-x"></i></button>
+    </div>
+    <div class="folders-list" id="folders-list" style="max-height: 300px; overflow-y: auto; margin-bottom: 20px;">
+      <!-- Folders will be populated here -->
+    </div>
+    <div class="field-group">
+      <label>Add new folder (absolute path, e.g. D:\Music or C:\Users\username\Music)</label>
+      <div style="display:flex;gap:10px;">
+        <input type="text" id="new-folder-path" class="field-input" placeholder="e.g. D:\Music or C:\Users\username\Music">
+        <button class="btn-primary" id="add-folder-btn">Add</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Download Dialog -->
+  <dialog id="download-sheet">
+    <form method="dialog" id="download-form">
+      <div class="dialog-header">
+        <div><p class="eyebrow">ACQUIRE</p><h2>Download</h2></div>
+        <button class="round-action" value="cancel"><i class="ph ph-x"></i></button>
+      </div>
+      
+      <div class="type-toggle">
+        <button type="button" class="type-btn active" id="type-audio"><i class="ph ph-music-notes"></i> Audio</button>
+        <button type="button" class="type-btn" id="type-video"><i class="ph ph-film-strip"></i> Video</button>
+      </div>
+
+      <div class="field-group">
+        <label for="download-url">URL</label>
+        <input class="field-input" id="download-url" type="url" placeholder="https://..." required>
+      </div>
+      <div class="field-group">
+        <label for="download-category">Category (Optional)</label>
+        <input class="field-input" id="download-category" type="text" placeholder="e.g. Lofi, Jazz">
+      </div>
+
+      <!-- Audio Options -->
+      <div id="audio-options">
+        <div class="field-group">
+          <label>Format</label>
+          <select class="field-input" id="download-format">
+            <option value="mp3">MP3</option>
+            <option value="m4a">M4A</option>
+            <option value="flac">FLAC</option>
+            <option value="wav">WAV</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label>Quality</label>
+          <select class="field-input" id="download-quality">
+            <option value="128">128 kbps</option>
+            <option value="192" selected>192 kbps</option>
+            <option value="320">320 kbps</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Video Options -->
+      <div id="video-options" class="hidden">
+        <div class="field-group">
+          <label>Container</label>
+          <select class="field-input" id="download-video-format">
+            <option value="mp4" selected>MP4</option>
+            <option value="webm">WebM</option>
+            <option value="mkv">MKV</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label>Resolution</label>
+          <select class="field-input" id="download-video-quality">
+            <option value="480">480p</option>
+            <option value="720" selected>720p</option>
+            <option value="1080">1080p</option>
+            <option value="best">Best available</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Progress -->
+      <div class="field-group hidden" id="dl-progress-wrap">
+        <div class="dl-progress-bar"><div class="dl-progress-fill" id="dl-progress-fill"></div></div>
+        <p style="font-size:12px;color:var(--text-muted);margin-top:8px;" id="dl-progress-label">Starting...</p>
+      </div>
+
+      <button class="btn-primary btn-full" id="download-submit">Download</button>
+      <button type="button" class="btn-primary btn-full hidden" id="download-cancel" style="background:#ff4d4d;margin-top:10px;">Cancel Download</button>
+      <p style="font-size:12px;color:var(--text-muted);margin-top:16px;text-align:center;" id="download-note">Saved to downloads folder.</p>
+    </form>
+  </dialog>
+
+  <!-- Video Player Modal -->
+  <div class="video-modal hidden" id="video-modal">
+    <div class="video-backdrop" id="video-modal-backdrop"></div>
+    <div class="video-content">
+      <div class="video-top">
+        <div>
+          <h3 id="video-modal-title">Title</h3>
+          <span id="video-modal-artist">Artist</span>
+        </div>
+        <button class="round-action" id="video-modal-close"><i class="ph ph-x"></i></button>
+      </div>
+      <video id="video-player" controls></video>
+      <iframe id="youtube-video-player" class="hidden" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+      <div class="video-bottom">
+        <button class="btn-primary" id="video-modal-stream-audio" style="gap: 6px;"><i class="ph-fill ph-music-notes"></i> Stream Audio</button>
+        <a id="video-modal-yt-link" class="btn-secondary" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 6px; text-decoration: none;"><i class="ph ph-arrow-square-out"></i> Watch on YouTube</a>
+        <button class="btn-secondary" id="video-modal-lyrics"><i class="ph ph-quotes"></i></button>
+        <button class="btn-secondary" id="video-modal-favorite"><i class="ph ph-star"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Equalizer & 8D Spatial Audio Dialog -->
+  <dialog id="eq-sheet" class="eq-sheet">
+    <div class="eq-container">
+      <div class="dialog-header">
+        <div>
+          <p class="eyebrow">AUDIOPHILE DSP</p>
+          <h2>Sound Processor & 8D Spatial</h2>
+        </div>
+        <button class="round-action" id="eq-close"><i class="ph ph-x"></i></button>
+      </div>
+
+      <!-- Presets Row -->
+      <div class="eq-presets-bar">
+        <span class="eq-presets-label">Presets:</span>
+        <div class="eq-presets-list" id="eq-presets-list">
+          <button class="eq-preset-btn active" data-preset="flat">Flat</button>
+          <button class="eq-preset-btn" data-preset="bass">Bass Boost</button>
+          <button class="eq-preset-btn" data-preset="cyberpunk">Cyberpunk Synth</button>
+          <button class="eq-preset-btn" data-preset="vocal">Vocal Sparkle</button>
+          <button class="eq-preset-btn" data-preset="acoustic">Acoustic Live</button>
+          <button class="eq-preset-btn" data-preset="nightcore">Nightcore</button>
+          <button class="eq-preset-btn" data-preset="immersion">Deep Immersion</button>
+        </div>
+      </div>
+
+      <!-- 10-Band Sliders Stage -->
+      <div class="eq-sliders-stage" id="eq-sliders-stage"></div>
+
+      <!-- Extra DSP Enhancers: Bass Booster & 8D Spatial Audio -->
+      <div class="eq-dsp-row">
+        <!-- Bass Booster -->
+        <div class="eq-dsp-card">
+          <div class="dsp-card-header">
+            <i class="ph-fill ph-speaker-simple-high" style="color:var(--accent);"></i>
+            <strong>Sub-Bass Booster</strong>
+            <span class="dsp-val" id="bass-boost-val">+0 dB</span>
+          </div>
+          <input type="range" id="bass-boost-slider" min="0" max="14" step="0.5" value="0">
+        </div>
+
+        <!-- 8D Spatial Audio -->
+        <div class="eq-dsp-card">
+          <div class="dsp-card-header">
+            <i class="ph-fill ph-headphones" style="color:var(--accent);"></i>
+            <strong>8D 360° Spatial Audio</strong>
+            <label class="switch">
+              <input type="checkbox" id="spatial-toggle">
+              <span class="slider round"></span>
+            </label>
+          </div>
+          <div class="spatial-controls" id="spatial-controls" style="display:flex;align-items:center;gap:10px;margin-top:8px;">
+            <span style="font-size:11px;color:var(--text-muted);">Orbit Speed:</span>
+            <input type="range" id="spatial-speed-slider" min="0.1" max="0.8" step="0.05" value="0.25" style="flex:1;">
+            <div class="spatial-orbit-indicator" id="spatial-orbit-indicator">
+              <div class="orbit-center"></div>
+              <div class="orbit-satellite" id="orbit-satellite"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="eq-footer">
+        <button class="btn-secondary" id="eq-reset-btn"><i class="ph ph-arrow-counter-clockwise"></i> Reset EQ</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Atmosphere & Sleep Timer Dialog -->
+  <dialog id="ambient-sheet" class="ambient-sheet">
+    <div class="ambient-container">
+      <div class="dialog-header">
+        <div>
+          <p class="eyebrow">ATMOSPHERE & SLEEP</p>
+          <h2>Ambient Soundscapes & Timer</h2>
+        </div>
+        <button class="round-action" id="ambient-close"><i class="ph ph-x"></i></button>
+      </div>
+
+      <!-- Ambient Soundscape Mixers -->
+      <div class="ambient-mixers-grid">
+        <!-- 1. Rain -->
+        <div class="ambient-card" id="card-rain">
+          <div class="ambient-card-top">
+            <div class="ambient-icon-box"><i class="ph-fill ph-cloud-rain"></i></div>
+            <div>
+              <strong>Rain on Glass</strong>
+              <span class="ambient-sub">Gentle cozy rainfall</span>
+            </div>
+            <span class="ambient-vol-val" id="vol-rain-val">0%</span>
+          </div>
+          <input type="range" class="ambient-slider" id="ambient-rain-slider" min="0" max="1" step="0.05" value="0">
+        </div>
+
+        <!-- 2. Fireplace -->
+        <div class="ambient-card" id="card-fire">
+          <div class="ambient-card-top">
+            <div class="ambient-icon-box"><i class="ph-fill ph-fire"></i></div>
+            <div>
+              <strong>Vinyl Fireplace</strong>
+              <span class="ambient-sub">Warm crackling hearth</span>
+            </div>
+            <span class="ambient-vol-val" id="vol-fire-val">0%</span>
+          </div>
+          <input type="range" class="ambient-slider" id="ambient-fire-slider" min="0" max="1" step="0.05" value="0">
+        </div>
+
+        <!-- 3. Ocean Waves -->
+        <div class="ambient-card" id="card-ocean">
+          <div class="ambient-card-top">
+            <div class="ambient-icon-box"><i class="ph-fill ph-waves"></i></div>
+            <div>
+              <strong>Ocean Tide</strong>
+              <span class="ambient-sub">Deep rhythmic coast</span>
+            </div>
+            <span class="ambient-vol-val" id="vol-ocean-val">0%</span>
+          </div>
+          <input type="range" class="ambient-slider" id="ambient-ocean-slider" min="0" max="1" step="0.05" value="0">
+        </div>
+
+        <!-- 4. Night Meadow / Wind -->
+        <div class="ambient-card" id="card-wind">
+          <div class="ambient-card-top">
+            <div class="ambient-icon-box"><i class="ph-fill ph-wind"></i></div>
+            <div>
+              <strong>Night Breeze</strong>
+              <span class="ambient-sub">Calm evening wind</span>
+            </div>
+            <span class="ambient-vol-val" id="vol-wind-val">0%</span>
+          </div>
+          <input type="range" class="ambient-slider" id="ambient-wind-slider" min="0" max="1" step="0.05" value="0">
+        </div>
+      </div>
+
+      <!-- Sleep Timer Section -->
+      <div class="sleep-timer-card">
+        <div class="sleep-timer-header">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <i class="ph-fill ph-moon-stars" style="color:var(--accent);font-size:22px;"></i>
+            <div>
+              <strong>Fade-Out Sleep Timer</strong>
+              <p class="ambient-sub">Gently dims music and shuts down playback</p>
+            </div>
+          </div>
+          <span class="sleep-status-badge" id="sleep-timer-badge">Off</span>
+        </div>
+
+        <div class="sleep-presets-row">
+          <button class="sleep-preset-btn" data-minutes="15">15 Min</button>
+          <button class="sleep-preset-btn" data-minutes="30">30 Min</button>
+          <button class="sleep-preset-btn" data-minutes="45">45 Min</button>
+          <button class="sleep-preset-btn" data-minutes="60">60 Min</button>
+          <button class="sleep-preset-btn btn-danger hidden" id="sleep-cancel-btn"><i class="ph ph-stop"></i> Cancel Timer</button>
+        </div>
+      </div>
+
+      <div class="eq-footer">
+        <button class="btn-secondary" id="ambient-mute-all-btn"><i class="ph ph-speaker-slash"></i> Mute Atmosphere</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Edit Track Metadata & Artwork Dialog -->
+  <dialog id="edit-track-sheet" class="edit-track-sheet">
+    <div class="edit-track-container">
+      <div class="dialog-header">
+        <div>
+          <p class="eyebrow">TAG EDITOR</p>
+          <h2>Edit Track Metadata</h2>
+        </div>
+        <button class="round-action" id="edit-track-close"><i class="ph ph-x"></i></button>
+      </div>
+
+      <div class="edit-track-layout">
+        <!-- Artwork Upload Box -->
+        <div class="edit-art-col">
+          <label style="font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:8px;">Album Cover</label>
+          <div class="edit-art-preview" id="edit-art-preview">
+            <i class="ph-fill ph-image" id="edit-art-icon" style="font-size:40px;color:var(--text-muted);"></i>
+            <img id="edit-art-img" class="hidden" alt="Cover Preview">
+            <div class="edit-art-overlay">
+              <i class="ph ph-camera"></i>
+              <span>Change Art</span>
+            </div>
+          </div>
+          <input type="file" id="edit-art-input" accept="image/png, image/jpeg, image/webp" class="hidden">
+        </div>
+
+        <!-- Metadata Form Inputs -->
+        <div class="edit-fields-col">
+          <input type="hidden" id="edit-track-id">
+          
+          <div class="field-group">
+            <label for="edit-track-title">Title</label>
+            <input class="field-input" id="edit-track-title" type="text" placeholder="Song title" required>
+          </div>
+
+          <div class="field-group">
+            <label for="edit-track-artist">Artist</label>
+            <input class="field-input" id="edit-track-artist" type="text" placeholder="Artist name">
+          </div>
+
+          <div class="field-group">
+            <label for="edit-track-album">Album</label>
+            <input class="field-input" id="edit-track-album" type="text" placeholder="Album name">
+          </div>
+
+          <div class="field-group">
+            <label for="edit-track-category">Category / Mood Tag</label>
+            <input class="field-input" id="edit-track-category" type="text" placeholder="e.g. Chill, Workout, Anime">
+          </div>
+        </div>
+      </div>
+
+      <div class="eq-footer" style="display:flex;justify-content:flex-end;gap:12px;margin-top:12px;">
+        <button class="btn-secondary" id="edit-track-cancel-btn">Cancel</button>
+        <button class="btn-primary" id="edit-track-save-btn"><i class="ph ph-floppy-disk"></i> Save Changes</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Create Playlist Dialog -->
+  <dialog id="playlist-create-sheet">
+    <form method="dialog" id="playlist-create-form">
+      <div class="dialog-header">
+        <div>
+          <p class="eyebrow">CURATION</p>
+          <h2>Create Playlist</h2>
+        </div>
+        <button type="button" class="round-action" id="playlist-create-close"><i class="ph ph-x"></i></button>
+      </div>
+      <div class="field-group">
+        <label for="playlist-name-input">Playlist Title</label>
+        <input type="text" id="playlist-name-input" class="field-input" placeholder="e.g. Midnight Drive, Lofi Study, Acoustic..." required autocomplete="off">
+      </div>
+      <div class="dialog-actions" style="display:flex;justify-content:flex-end;gap:12px;margin-top:24px;">
+        <button type="button" class="btn-secondary" id="playlist-create-cancel">Cancel</button>
+        <button type="submit" class="btn-primary" id="playlist-create-submit"><i class="ph ph-plus"></i> Create Playlist</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- YouTube Playlist Importer Dialog -->
+  <dialog id="yt-playlist-import-modal" class="modal-sheet" style="max-width: 580px; width: 92vw;">
+    <div class="dialog-header">
+      <div>
+        <p class="eyebrow" style="margin:0;"><i class="ph-fill ph-youtube-logo" style="color:#ff4444;"></i> YOUTUBE IMPORTER</p>
+        <h2 style="font-size:22px;margin:4px 0 0;">Import YouTube Playlist</h2>
+      </div>
+      <button type="button" class="round-action" id="yt-playlist-modal-close"><i class="ph ph-x"></i></button>
+    </div>
+
+    <!-- Step 1: Input URL -->
+    <div id="yt-pl-step-url" style="margin-top:14px;">
+      <p class="muted" style="font-size:13px;margin:0 0 16px;">Paste any public or unlisted YouTube / YouTube Music playlist URL to import into Linus.</p>
+      <div class="field-group">
+        <label for="yt-playlist-url-input">Playlist URL</label>
+        <div style="display:flex;gap:8px;">
+          <input type="url" id="yt-playlist-url-input" class="field-input" placeholder="https://www.youtube.com/playlist?list=..." style="flex:1;">
+          <button type="button" class="btn-primary" id="yt-playlist-fetch-btn" style="white-space:nowrap;display:flex;align-items:center;gap:6px;">
+            <i class="ph-bold ph-magnifying-glass"></i> Fetch Tracks
+          </button>
+        </div>
+      </div>
+      <div id="yt-pl-fetch-loading" class="hidden" style="text-align:center;padding:24px 0;color:var(--text-muted);">
+        <div class="spinner" style="margin:0 auto 12px;width:26px;height:26px;border:2px solid rgba(255,255,255,0.1);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+        <span style="font-size:13px;">Extracting playlist tracks from YouTube...</span>
+      </div>
+    </div>
+
+    <!-- Step 2: Preview & Import -->
+    <div id="yt-pl-step-preview" class="hidden" style="margin-top:16px;">
+      <div class="yt-pl-preview-card" style="display:flex;align-items:center;gap:14px;padding:12px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;margin-bottom:14px;">
+        <img id="yt-pl-preview-thumb" src="" alt="Cover" style="width:68px;height:68px;border-radius:8px;object-fit:cover;background:rgba(0,0,0,0.3);flex-shrink:0;">
+        <div style="flex:1;min-width:0;">
+          <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:2px;">Playlist Name</label>
+          <input type="text" id="yt-pl-name-input" class="field-input" style="font-weight:600;font-size:14px;padding:6px 10px;margin-bottom:6px;" placeholder="Playlist name">
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-muted);">
+            <span id="yt-pl-uploader-label">Uploader</span>
+            <span>•</span>
+            <span id="yt-pl-count-badge" style="color:var(--accent);font-weight:600;">0 tracks</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scrollable Track Preview List -->
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;">
+        <span>Tracks to import</span>
+        <span id="yt-pl-preview-duration">0 min</span>
+      </div>
+      <div id="yt-pl-tracks-preview-list" class="yt-pl-tracks-list" style="max-height:220px;overflow-y:auto;background:rgba(0,0,0,0.25);border:1px solid var(--border);border-radius:10px;padding:6px;margin-bottom:18px;">
+        <!-- Dynamic track items -->
+      </div>
+
+      <div class="dialog-actions" style="display:flex;gap:10px;justify-content:flex-end;align-items:center;">
+        <button type="button" class="btn-secondary" id="yt-pl-back-btn">Back</button>
+        <button type="button" class="btn-primary" id="yt-pl-import-stream-btn" style="background:linear-gradient(135deg,#e5a95d,#c48d42);color:#121212;font-weight:600;display:flex;align-items:center;gap:6px;">
+          <i class="ph-bold ph-lightning"></i> Import & Stream Now
+        </button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Weekly Sound Rewind & Musical Persona Modal -->
+  <dialog id="weekly-rewind-modal" class="modal-sheet weekly-rewind-modal" style="max-width: 620px; width: 94vw;">
+    <div class="dialog-header">
+      <div>
+        <span class="eyebrow" style="color:var(--accent);display:flex;align-items:center;gap:6px;">
+          <i class="ph-bold ph-calendar-star"></i> SOUND REWIND
+        </span>
+        <h2 id="rewind-modal-timeframe">Weekly Sound Rewind</h2>
+      </div>
+      <button class="icon-button" id="rewind-modal-close" aria-label="Close Rewind"><i class="ph ph-x"></i></button>
+    </div>
+
+    <div class="rewind-modal-body" id="rewind-modal-content">
+      <!-- Loading State -->
+      <div id="rewind-loading-spinner" class="rewind-loading-state">
+        <div class="spinner"></div>
+        <p style="margin-top:12px;color:var(--text-muted);font-size:13px;">Synthesizing your weekly listening identity...</p>
+      </div>
+
+      <!-- Loaded Rewind Content Container (hidden initially) -->
+      <div id="rewind-loaded-container" class="hidden">
+        <!-- 1. Musical Persona Showcase Card -->
+        <div class="rewind-persona-card" id="rewind-persona-card">
+          <div class="rewind-persona-glow" id="rewind-persona-glow"></div>
+          <div class="rewind-persona-header">
+            <span class="rewind-persona-badge-pill" id="rewind-persona-pill">
+              <i class="ph-fill ph-fingerprint"></i> YOUR MUSICAL PERSONA
+            </span>
+          </div>
+          <div class="rewind-persona-main">
+            <span class="rewind-persona-emoji" id="rewind-persona-emoji">🦉</span>
+            <div class="rewind-persona-titles">
+              <h3 class="rewind-persona-title" id="rewind-persona-title">The Night Owl Explorer</h3>
+              <p class="rewind-persona-motto" id="rewind-persona-motto">Crafting nocturnal soundtracks when the world is fast asleep.</p>
+            </div>
+          </div>
+          <div class="rewind-persona-traits" id="rewind-persona-traits">
+            <!-- Dynamic trait tags -->
+          </div>
+        </div>
+
+        <!-- 2. Sound Metrics Tiles (4-grid) -->
+        <div class="rewind-stats-grid">
+          <div class="rewind-stat-tile">
+            <i class="ph-bold ph-clock-countdown rewind-stat-icon"></i>
+            <span class="rewind-stat-value" id="rewind-stat-time">--</span>
+            <span class="rewind-stat-label">Listening Time</span>
+          </div>
+          <div class="rewind-stat-tile">
+            <i class="ph-bold ph-music-notes rewind-stat-icon"></i>
+            <span class="rewind-stat-value" id="rewind-stat-plays">--</span>
+            <span class="rewind-stat-label">Tracks Completed</span>
+          </div>
+          <div class="rewind-stat-tile">
+            <i class="ph-bold ph-calendar-check rewind-stat-icon"></i>
+            <span class="rewind-stat-value" id="rewind-stat-days">--</span>
+            <span class="rewind-stat-label">Active Days</span>
+          </div>
+          <div class="rewind-stat-tile">
+            <i class="ph-bold ph-sparkle rewind-stat-icon"></i>
+            <span class="rewind-stat-value" id="rewind-stat-peak">--</span>
+            <span class="rewind-stat-label">Peak Listening</span>
+          </div>
+        </div>
+
+        <!-- 3. Top 5 Tracks of the Week -->
+        <div class="rewind-tracks-section">
+          <div class="rewind-section-head">
+            <h4><i class="ph-bold ph-trophy" style="color:#f5c87a;margin-right:6px;"></i> Top Tracks This Week</h4>
+            <span class="rewind-section-sub" id="rewind-genre-sub">Top Genre: Pop</span>
+          </div>
+          <div class="rewind-tracks-list" id="rewind-tracks-list">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <!-- 4. Modal Actions -->
+        <div class="rewind-actions-footer">
+          <button class="btn-primary" id="rewind-play-mix-btn">
+            <i class="ph-fill ph-play"></i> Play Weekly Mix
+          </button>
+          <button class="btn-secondary" id="rewind-copy-summary-btn" title="Copy listening recap to clipboard">
+            <i class="ph-bold ph-share-network"></i> Share Summary
+          </button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Add Track to Playlist Dialog -->
+  <dialog id="add-to-playlist-sheet">
+    <div class="dialog-header">
+      <div>
+        <p class="eyebrow">CURATION</p>
+        <h2>Add to Playlist</h2>
+      </div>
+      <button type="button" class="round-action" id="add-to-playlist-close"><i class="ph ph-x"></i></button>
+    </div>
+    <p class="muted" id="add-to-playlist-track-name" style="margin-bottom:16px;">Select a playlist:</p>
+    <div class="playlist-select-list" id="playlist-select-list" style="display:flex;flex-direction:column;gap:8px;max-height:280px;overflow-y:auto;margin-bottom:20px;"></div>
+    <div class="dialog-actions" style="display:flex;justify-content:space-between;align-items:center;">
+      <button type="button" class="btn-secondary" id="open-new-from-add-btn"><i class="ph ph-plus"></i> New Playlist</button>
+      <button type="button" class="btn-secondary" id="add-to-playlist-cancel">Cancel</button>
+    </div>
+  </dialog>
+
+  <!-- Manual Lyrics Search & Switcher Dialog -->
+  <dialog id="lyrics-search-sheet" class="modal-sheet" style="max-width: 680px; width: 90vw;">
+    <div class="studio-modal-container">
+      <div class="dialog-header">
+        <div>
+          <p class="eyebrow" style="margin:0;">UNIVERSAL LYRICS EXPLORER</p>
+          <h2 style="font-size:22px;margin:4px 0 0;">Search & Switch Lyrics</h2>
+        </div>
+        <button type="button" class="round-action" id="lyrics-search-close"><i class="ph ph-x"></i></button>
+      </div>
+
+      <div style="margin-bottom: 14px;">
+        <p class="muted" id="lyrics-search-target" style="font-size: 13px; margin-bottom: 10px;">Target: <strong>-</strong></p>
+        <div style="display:flex; gap:8px;">
+          <input type="text" id="lyrics-search-input" placeholder="Search by song name, artist or movie..." style="flex:1; padding: 10px 14px; border-radius: 8px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size:14px;">
+          <button type="button" class="btn-primary" id="lyrics-search-submit-btn"><i class="ph ph-magnifying-glass"></i> Search</button>
+        </div>
+      </div>
+
+      <div id="lyrics-search-loading" class="hidden" style="text-align:center; padding: 24px 0; color: var(--accent);">
+        <i class="ph ph-spinner-gap spinning" style="font-size: 24px;"></i>
+        <p style="margin-top: 8px; font-size: 13px;">Searching LRCLIB & NetEase globally...</p>
+      </div>
+
+      <div id="lyrics-search-results" style="display:flex; flex-direction:column; gap:10px; max-height: 340px; overflow-y: auto; padding-right: 4px; margin-bottom: 16px;">
+        <p class="muted" style="text-align:center; padding: 20px 0;">Enter a song title or artist name to find synchronized and plain lyrics.</p>
+      </div>
+
+      <div class="dialog-actions" style="display:flex; justify-content:flex-end;">
+        <button type="button" class="btn-secondary" id="lyrics-search-cancel-btn">Close</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Studio Customizer & Atmosphere Dialog -->
+  <dialog id="theme-studio-sheet" class="modal-sheet theme-studio-modal">
+    <div class="studio-modal-container">
+      <div class="dialog-header">
+        <div>
+          <p class="eyebrow" style="margin:0;">CREATIVE SUITE</p>
+          <h2 style="font-size:24px;margin:4px 0 0;">Personalization & Atmosphere Studio</h2>
+        </div>
+        <button type="button" class="round-action" id="theme-studio-close"><i class="ph ph-x"></i></button>
+      </div>
+
+      <!-- Studio Navigation Tabs -->
+      <div class="studio-tabs-row">
+        <button class="studio-tab-btn active" data-tab="colors"><i class="ph-fill ph-palette"></i> Colors & Fonts</button>
+        <button class="studio-tab-btn" data-tab="wallpapers"><i class="ph-fill ph-film-strip"></i> Live Wallpapers & Video</button>
+        <button class="studio-tab-btn" data-tab="effects"><i class="ph-fill ph-sparkle"></i> Aesthetics & Vinyl</button>
+      </div>
+
+      <!-- Tab 1: Colors & Typography -->
+      <div class="studio-tab-content active" id="tab-colors">
+        <div class="studio-section-title">
+          <span>🎨 Real-Time Color Palette</span>
+          <button class="btn-secondary btn-sm" id="reset-colors-btn"><i class="ph ph-arrow-counter-clockwise"></i> Reset Colors</button>
+        </div>
+
+        <div class="color-pickers-grid">
+          <div class="color-picker-card">
+            <div class="picker-label-row">
+              <strong>Accent Glow</strong>
+              <span class="color-val" id="val-accent">#e5a95d</span>
+            </div>
+            <div class="picker-input-wrapper">
+              <input type="color" id="picker-accent" value="#e5a95d">
+              <span>Buttons, highlights & neon glow</span>
+            </div>
+          </div>
+
+          <div class="color-picker-card">
+            <div class="picker-label-row">
+              <strong>Background</strong>
+              <span class="color-val" id="val-bg">#0d0a08</span>
+            </div>
+            <div class="picker-input-wrapper">
+              <input type="color" id="picker-bg" value="#0d0a08">
+              <span>Deep canvas backdrop color</span>
+            </div>
+          </div>
+
+          <div class="color-picker-card">
+            <div class="picker-label-row">
+              <strong>Cards & Surface</strong>
+              <span class="color-val" id="val-surface">#17120e</span>
+            </div>
+            <div class="picker-input-wrapper">
+              <input type="color" id="picker-surface" value="#17120e">
+              <span>Panels, sidebar & player bar</span>
+            </div>
+          </div>
+
+          <div class="color-picker-card">
+            <div class="picker-label-row">
+              <strong>Text & Titles</strong>
+              <span class="color-val" id="val-text">#fdf6ec</span>
+            </div>
+            <div class="picker-input-wrapper">
+              <input type="color" id="picker-text" value="#fdf6ec">
+              <span>Headings, body & navigation</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="studio-section-title" style="margin-top:20px;">
+          <span>✍️ Typography Aesthetics</span>
+        </div>
+        <div class="font-presets-grid">
+          <button class="font-preset-btn active" data-font="serif">
+            <strong style="font-family:'Instrument Serif', serif;font-size:20px;">Instrument Serif</strong>
+            <span>Editorial, poetic & serene</span>
+          </button>
+          <button class="font-preset-btn" data-font="sans">
+            <strong style="font-family:'Outfit', sans-serif;font-size:16px;">Outfit Modern Sans</strong>
+            <span>Minimalist, clean & geometric</span>
+          </button>
+          <button class="font-preset-btn" data-font="mono">
+            <strong style="font-family:monospace;font-size:15px;">Cyberpunk Monospace</strong>
+            <span>Retro terminal & sci-fi</span>
+          </button>
+          <button class="font-preset-btn" data-font="cursive">
+            <strong style="font-family:'Playfair Display', Georgia, serif;font-size:18px;">Playfair Classic</strong>
+            <span>Luxury & high-end elegance</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Tab 2: Wallpapers & Live Atmosphere -->
+      <div class="studio-tab-content hidden" id="tab-wallpapers">
+        <!-- Sub-Folder Navigation Pill Tabs (Wallpapers First, Live Videos Second) -->
+        <div class="studio-subfolder-nav">
+          <button class="subfolder-pill-btn active" data-subfolder="photos"><i class="ph-fill ph-image"></i> Wallpapers</button>
+          <button class="subfolder-pill-btn" data-subfolder="videos"><i class="ph-fill ph-film-strip"></i> Live Videos</button>
+        </div>
+
+        <!-- FOLDER 1 (DEFAULT): Aesthetic Wallpapers with Most Used Front Page -->
+        <div class="subfolder-view active" id="subfolder-photos">
+          <div class="studio-section-title">
+            <span>⭐ Most Used & Popular Wallpapers</span>
+            <button type="button" class="btn-secondary btn-sm" id="open-wallpaper-gallery-btn"><i class="ph-fill ph-squares-four"></i> See More (50+)</button>
+          </div>
+
+          <!-- Dynamic Front Page Top Shelf Grid (Sorted by user clicks & popularity) -->
+          <div class="live-wallpaper-grid" id="featured-wallpapers-grid">
+            <!-- Dynamically populated by renderFeaturedWallpapersTray() -->
+          </div>
+
+          <!-- Large 'See More Wallpapers' Interactive Banner -->
+          <div class="see-more-wallpaper-card" id="see-more-banner-btn">
+            <div class="see-more-content">
+              <div class="see-more-icon"><i class="ph-fill ph-images"></i></div>
+              <div>
+                <strong>Explore Full 50+ Wallpaper Gallery</strong>
+                <span class="muted" style="font-size:12px;">Anime, Cyberpunk, Nature, Space, Minimalist & Cozy collections</span>
+              </div>
+            </div>
+            <span class="see-more-btn-action"><i class="ph-bold ph-arrow-right"></i> Open Gallery</span>
+          </div>
+        </div>
+
+        <!-- FOLDER 2: Live Video Loops -->
+        <div class="subfolder-view hidden" id="subfolder-videos">
+          <div class="studio-section-title">
+            <span>🎬 Curated Atmospheric Live Video Loops</span>
+          </div>
+
+          <div class="live-wallpaper-grid">
+            <button class="wallpaper-card active" data-wp="aura">
+              <div class="wallpaper-thumb-preview swatch-aura-live"></div>
+              <strong>🎨 Dynamic Living Aura</strong>
+              <span>Fluid audio pulse gradient</span>
+            </button>
+
+            <button class="wallpaper-card" data-wp="lofi">
+              <div class="wallpaper-thumb-preview wp-lofi-thumb"></div>
+              <strong>☕ Lo-Fi Rainy Window</strong>
+              <span>Cozy rain on nighttime window</span>
+            </button>
+
+            <button class="wallpaper-card" data-wp="fireplace">
+              <div class="wallpaper-thumb-preview wp-fire-thumb"></div>
+              <strong>🔥 Campfire Hearth</strong>
+              <span>Warm flickering campfire</span>
+            </button>
+
+            <button class="wallpaper-card" data-wp="cyber">
+              <div class="wallpaper-thumb-preview wp-cyber-thumb"></div>
+              <strong>🌆 Synthwave Neon City</strong>
+              <span>Cyberpunk highway traffic glow</span>
+            </button>
+
+            <button class="wallpaper-card" data-wp="space">
+              <div class="wallpaper-thumb-preview wp-space-thumb"></div>
+              <strong>🌌 Deep Starfield Nebula</strong>
+              <span>Cosmic star movement</span>
+            </button>
+
+            <button class="wallpaper-card" data-wp="ocean">
+              <div class="wallpaper-thumb-preview wp-ocean-thumb"></div>
+              <strong>🌊 Sunset Ocean Waves</strong>
+              <span>Calm coastal shoreline tide</span>
+            </button>
+
+            <button class="wallpaper-card" data-wp="sunset_drive">
+              <div class="wallpaper-thumb-preview wp-drive-thumb"></div>
+              <strong>🚗 Retro Sunset Drive</strong>
+              <span>80s Synth sunset cruise</span>
+            </button>
+
+            <button class="wallpaper-card" data-wp="tokyo_night">
+              <div class="wallpaper-thumb-preview wp-tokyo-thumb"></div>
+              <strong>🏮 Tokyo Rainy Night</strong>
+              <span>Neon rain alleyway</span>
+            </button>
+
+            <button class="wallpaper-card" data-wp="mountain_clouds">
+              <div class="wallpaper-thumb-preview wp-mountain-thumb"></div>
+              <strong>⛰️ Mountain Cloud Flow</strong>
+              <span>Majestic alpine sunset mist</span>
+            </button>
+
+            <button class="wallpaper-card" data-wp="aurora_borealis">
+              <div class="wallpaper-thumb-preview wp-aurora-thumb"></div>
+              <strong>✨ Northern Aurora Skies</strong>
+              <span>Emerald polar aurora</span>
+            </button>
+
+            <button class="wallpaper-card" data-wp="cozy_coffee">
+              <div class="wallpaper-thumb-preview wp-coffee-thumb"></div>
+              <strong>☕ Cozy Cafe Steaming Mug</strong>
+              <span>Warm rainy cafe atmosphere</span>
+            </button>
+
+            <button class="wallpaper-card" data-wp="neon_tunnel">
+              <div class="wallpaper-thumb-preview wp-tunnel-thumb"></div>
+              <strong>⚡ Hyper Neon Cyber Tunnel</strong>
+              <span>Futuristic optical warp speed</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- OUTSIDE FOLDERS: Custom Upload Boxes for Personal Photo & Video -->
+        <div class="studio-section-title" style="margin-top:20px;">
+          <span>📁 Import Personal Custom Media (Outside Folders)</span>
+        </div>
+
+        <div class="custom-media-import-deck">
+          <!-- Custom Photo Import Card -->
+          <div class="media-import-card">
+            <div class="import-card-header">
+              <div class="import-icon-box"><i class="ph-fill ph-image"></i></div>
+              <div>
+                <strong>Custom Photo / Wallpaper</strong>
+                <span>Upload any photo file or paste image URL</span>
+              </div>
+            </div>
+            <div class="import-inputs-row">
+              <input type="file" id="custom-wallpaper-file" accept="image/*" class="field-input">
+              <input type="url" id="custom-wallpaper-url" placeholder="Or paste direct image URL (https://...)" class="field-input">
+            </div>
+          </div>
+
+          <!-- Custom Video Import Card -->
+          <div class="media-import-card">
+            <div class="import-card-header">
+              <div class="import-icon-box"><i class="ph-fill ph-video-camera"></i></div>
+              <div>
+                <strong>Custom Live Video Loop</strong>
+                <span>Upload any MP4 / WebM video or paste video URL</span>
+              </div>
+            </div>
+            <div class="import-inputs-row">
+              <input type="file" id="custom-video-file" accept="video/mp4, video/webm" class="field-input">
+              <input type="url" id="custom-video-url" placeholder="Or paste direct video URL (https://...mp4)" class="field-input">
+            </div>
+          </div>
+        </div>
+
+        <div class="custom-media-inputs-box hidden" id="custom-media-box">
+          <div class="field-group" id="custom-img-group"></div>
+          <div class="field-group hidden" id="custom-vid-group"></div>
+        </div>
+
+        <!-- Wallpaper Optics (Dim & Blur Sliders) -->
+        <div class="slider-controls-group" style="margin-top:18px;">
+          <div class="slider-row">
+            <div class="slider-header">
+              <span>Darkness & Readability Dimmer</span>
+              <strong id="val-wallpaper-dim">40%</strong>
+            </div>
+            <input type="range" id="slider-wallpaper-dim" min="0" max="90" value="40">
+          </div>
+
+          <div class="slider-row">
+            <div class="slider-header">
+              <span>Background Blur Depth</span>
+              <strong id="val-wallpaper-blur">0px</strong>
+            </div>
+            <input type="range" id="slider-wallpaper-blur" min="0" max="40" value="0">
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Aesthetics & Effects -->
+      <div class="studio-tab-content hidden" id="tab-effects">
+        <div class="studio-section-title">
+          <span>✨ Glassmorphism & Visual Radiance</span>
+        </div>
+
+        <div class="slider-controls-group">
+          <div class="slider-row">
+            <div class="slider-header">
+              <span>Card Glassmorphism Transparency</span>
+              <strong id="val-glass-opacity">75%</strong>
+            </div>
+            <input type="range" id="slider-glass-opacity" min="20" max="100" value="75">
+          </div>
+
+          <div class="slider-row">
+            <div class="slider-header">
+              <span>Neon Glow & Shadow Radiance</span>
+              <strong id="val-glow-intensity">40%</strong>
+            </div>
+            <input type="range" id="slider-glow-intensity" min="0" max="100" value="40">
+          </div>
+        </div>
+
+        <div class="studio-section-title" style="margin-top:20px;">
+          <span>💿 Custom Vinyl Disc Label & Beat Pulse</span>
+        </div>
+
+        <div class="toggle-card-row">
+          <div class="toggle-card-info">
+            <strong>🎵 Sound-Reactive Beat Pulsing</strong>
+            <span>Gently scale living aura & glow to audio frequencies</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="toggle-beat-pulse" checked>
+            <span class="slider-switch"></span>
+          </label>
+        </div>
+
+        <div class="toggle-card-row" style="margin-top:12px;">
+          <div class="toggle-card-info">
+            <strong>🏷️ Custom Vinyl Center Sticker</strong>
+            <span>Upload custom photo to replace vinyl center label</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <button class="btn-secondary btn-sm" id="upload-disc-sticker-btn"><i class="ph ph-upload-simple"></i> Choose Image</button>
+            <button class="btn-secondary btn-sm" id="reset-disc-sticker-btn" title="Reset to default">Default</button>
+            <input type="file" id="custom-disc-sticker-file" accept="image/*" class="hidden">
+          </div>
+        </div>
+
+        <div class="studio-section-title" style="margin-top:20px;">
+          <span>💬 Welcome Quote Splash Screen</span>
+        </div>
+
+        <div class="toggle-card-row">
+          <div class="toggle-card-info">
+            <strong>✨ Show Inspirational Quote on Launch</strong>
+            <span>Display an inspiring musical reflection each time the sanctuary opens</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="toggle-welcome-quote" checked>
+            <span class="slider-switch"></span>
+          </label>
+        </div>
+
+        <div class="toggle-card-row" style="margin-top:12px;" id="welcome-quote-freq-row">
+          <div class="toggle-card-info">
+            <strong>⏱️ Splash Frequency</strong>
+            <span>Choose how often quotes appear on startup</span>
+          </div>
+          <select id="welcome-quote-frequency" class="field-select" style="max-width:160px;padding:6px 10px;border-radius:8px;background:var(--surface-active);color:var(--text);border:1px solid var(--border);font-size:13px;">
+            <option value="always" selected>Every Launch</option>
+            <option value="daily">Once a Day</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="dialog-actions" style="display:flex;justify-content:space-between;align-items:center;margin-top:24px;padding-top:16px;border-top:1px solid var(--border);">
+        <button type="button" class="btn-secondary" id="studio-reset-all-btn"><i class="ph ph-arrow-counter-clockwise"></i> Reset to Default</button>
+        <button type="button" class="btn-primary" id="studio-done-btn"><i class="ph-fill ph-check-circle"></i> Apply & Done</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Fullscreen Studio Customizer Dialog -->
+  <dialog id="fs-theme-studio-sheet" class="modal-sheet theme-studio-modal">
+    <div class="studio-modal-container">
+      <div class="dialog-header">
+        <div>
+          <p class="eyebrow" style="margin:0;">FULL SCREEN EXCLUSIVE</p>
+          <h2 style="font-size:24px;margin:4px 0 0;">Full Screen Atmosphere & Lyrics Studio</h2>
+        </div>
+        <button type="button" class="round-action" id="fs-theme-studio-close"><i class="ph ph-x"></i></button>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <div class="studio-tabs-row">
+        <button class="studio-tab-btn fs-studio-tab-btn active" data-fstab="wallpapers"><i class="ph-fill ph-film-strip"></i> Background & Live Video</button>
+        <button class="studio-tab-btn fs-studio-tab-btn" data-fstab="lyrics"><i class="ph-fill ph-quotes"></i> Lyrics & Karaoke Glow</button>
+        <button class="studio-tab-btn fs-studio-tab-btn" data-fstab="atmosphere"><i class="ph-fill ph-sliders"></i> Dim & Blur Tuning</button>
+      </div>
+
+      <!-- Tab 1: Fullscreen Wallpapers & Live Video -->
+      <div class="studio-tab-content fs-tab-content active" id="fs-tab-wallpapers">
+        <!-- Sub-Folder Navigation Pill Tabs for Fullscreen (Wallpapers First, Live Videos Second) -->
+        <div class="studio-subfolder-nav">
+          <button class="subfolder-pill-btn fs-subfolder-pill-btn active" data-fssubfolder="photos"><i class="ph-fill ph-image"></i> Wallpapers</button>
+          <button class="subfolder-pill-btn fs-subfolder-pill-btn" data-fssubfolder="videos"><i class="ph-fill ph-film-strip"></i> Live Videos</button>
+        </div>
+
+        <!-- FOLDER 1 (DEFAULT): Fullscreen Aesthetic Wallpapers with Top Showcase -->
+        <div class="subfolder-view fs-subfolder-view active" id="fs-subfolder-photos">
+          <div class="studio-section-title">
+            <span>⭐ Most Used & Popular Fullscreen Wallpapers</span>
+            <button type="button" class="btn-secondary btn-sm" id="fs-open-wallpaper-gallery-btn"><i class="ph-fill ph-squares-four"></i> See More (50+)</button>
+          </div>
+
+          <!-- Dynamic Fullscreen Front Page Top Shelf Grid -->
+          <div class="live-wallpaper-grid" id="fs-featured-wallpapers-grid">
+            <!-- Dynamically populated by renderFullscreenFeaturedWallpapersTray() -->
+          </div>
+
+          <!-- Large 'See More Wallpapers' Interactive Banner for Fullscreen -->
+          <div class="see-more-wallpaper-card" id="fs-see-more-banner-btn">
+            <div class="see-more-content">
+              <div class="see-more-icon"><i class="ph-fill ph-images"></i></div>
+              <div>
+                <strong>Explore Full 50+ Wallpaper Gallery</strong>
+                <span class="muted" style="font-size:12px;">Browse all 50+ categorized 4K artworks</span>
+              </div>
+            </div>
+            <span class="see-more-btn-action"><i class="ph-bold ph-arrow-right"></i> Open Gallery</span>
+          </div>
+        </div>
+
+        <!-- FOLDER 2: Fullscreen Live Video Loops -->
+        <div class="subfolder-view fs-subfolder-view hidden" id="fs-subfolder-videos">
+          <div class="studio-section-title">
+            <span>🎬 Fullscreen 4K Live Atmosphere Video Loops</span>
+          </div>
+
+          <div class="live-wallpaper-grid">
+            <div class="wallpaper-card fs-wallpaper-card active" data-fswp="match-main">
+              <div class="wallpaper-thumb-preview swatch-aura-live">
+                <i class="ph-fill ph-sparkle"></i>
+              </div>
+              <strong>Dynamic Aurora</strong>
+              <span>Album Art Audio Aura</span>
+            </div>
+
+            <div class="wallpaper-card fs-wallpaper-card" data-fswp="lofi">
+              <div class="wallpaper-thumb-preview wp-lofi-thumb">
+                <i class="ph-fill ph-cloud-rain"></i>
+              </div>
+              <strong>Lo-Fi Rain</strong>
+              <span>4K Rain on Window Loop</span>
+            </div>
+
+            <div class="wallpaper-card fs-wallpaper-card" data-fswp="fireplace">
+              <div class="wallpaper-thumb-preview wp-fire-thumb">
+                <i class="ph-fill ph-fire"></i>
+              </div>
+              <strong>Cozy Hearth</strong>
+              <span>Warm Campfire Video</span>
+            </div>
+
+            <div class="wallpaper-card fs-wallpaper-card" data-fswp="cyber">
+              <div class="wallpaper-thumb-preview wp-cyber-thumb">
+                <i class="ph-fill ph-buildings"></i>
+              </div>
+              <strong>Neon City</strong>
+              <span>Synthwave Highway Loop</span>
+            </div>
+
+            <div class="wallpaper-card fs-wallpaper-card" data-fswp="space">
+              <div class="wallpaper-thumb-preview wp-space-thumb">
+                <i class="ph-fill ph-planet"></i>
+              </div>
+              <strong>Starfield</strong>
+              <span>Deep Nebula Stars Video</span>
+            </div>
+
+            <div class="wallpaper-card fs-wallpaper-card" data-fswp="ocean">
+              <div class="wallpaper-thumb-preview wp-ocean-thumb">
+                <i class="ph-fill ph-waves"></i>
+              </div>
+              <strong>Sunset Ocean</strong>
+              <span>Shoreline Coastal Tide</span>
+            </div>
+
+            <div class="wallpaper-card fs-wallpaper-card" data-fswp="sunset_drive">
+              <div class="wallpaper-thumb-preview wp-drive-thumb">
+                <i class="ph-fill ph-car"></i>
+              </div>
+              <strong>Sunset Drive</strong>
+              <span>80s Synth Highway Cruise</span>
+            </div>
+
+            <div class="wallpaper-card fs-wallpaper-card" data-fswp="tokyo_night">
+              <div class="wallpaper-thumb-preview wp-tokyo-thumb">
+                <i class="ph-fill ph-umbrella"></i>
+              </div>
+              <strong>Tokyo Rain</strong>
+              <span>Neon Alleyway Night</span>
+            </div>
+
+            <div class="wallpaper-card fs-wallpaper-card" data-fswp="mountain_clouds">
+              <div class="wallpaper-thumb-preview wp-mountain-thumb">
+                <i class="ph-fill ph-mountains"></i>
+              </div>
+              <strong>Alpine Clouds</strong>
+              <span>Sunset Mountain Flow</span>
+            </div>
+
+            <div class="wallpaper-card fs-wallpaper-card" data-fswp="aurora_borealis">
+              <div class="wallpaper-thumb-preview wp-aurora-thumb">
+                <i class="ph-fill ph-sun-horizon"></i>
+              </div>
+              <strong>Emerald Aurora</strong>
+              <span>Dancing Polar Night Sky</span>
+            </div>
+
+            <div class="wallpaper-card fs-wallpaper-card" data-fswp="cozy_coffee">
+              <div class="wallpaper-thumb-preview wp-coffee-thumb">
+                <i class="ph-fill ph-coffee"></i>
+              </div>
+              <strong>Cafe Atmosphere</strong>
+              <span>Steaming Mug & Rainy Mood</span>
+            </div>
+
+            <div class="wallpaper-card fs-wallpaper-card" data-fswp="neon_tunnel">
+              <div class="wallpaper-thumb-preview wp-tunnel-thumb">
+                <i class="ph-fill ph-lightning"></i>
+              </div>
+              <strong>Cyber Warp Tunnel</strong>
+              <span>Hyper Light Speed Motion</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- OUTSIDE FOLDERS: Fullscreen Custom Upload Deck -->
+        <div class="studio-section-title" style="margin-top:20px;">
+          <span>📁 Import Custom Media for Fullscreen (Outside Folders)</span>
+        </div>
+
+        <div class="custom-media-import-deck">
+          <!-- Custom Photo Import Card -->
+          <div class="media-import-card">
+            <div class="import-card-header">
+              <div class="import-icon-box"><i class="ph-fill ph-image"></i></div>
+              <div>
+                <strong>Fullscreen Custom Photo</strong>
+                <span>Upload image file or paste image URL</span>
+              </div>
+            </div>
+            <div class="import-inputs-row">
+              <input type="file" id="fs-custom-wallpaper-file" accept="image/*" class="field-input">
+              <input type="url" id="fs-custom-wallpaper-url" placeholder="Or paste direct image URL (https://...)" class="field-input">
+            </div>
+          </div>
+
+          <!-- Custom Video Import Card -->
+          <div class="media-import-card">
+            <div class="import-card-header">
+              <div class="import-icon-box"><i class="ph-fill ph-video-camera"></i></div>
+              <div>
+                <strong>Fullscreen Live Video Loop</strong>
+                <span>Upload MP4 / WebM video or paste video URL</span>
+              </div>
+            </div>
+            <div class="import-inputs-row">
+              <input type="file" id="fs-custom-video-file" accept="video/mp4, video/webm" class="field-input">
+              <input type="url" id="fs-custom-video-url" placeholder="Or paste direct video URL (https://...mp4)" class="field-input">
+            </div>
+          </div>
+        </div>
+
+        <div id="fs-custom-media-box" class="custom-media-inputs-box hidden">
+          <div id="fs-custom-img-group" class="field-group hidden"></div>
+          <div id="fs-custom-vid-group" class="field-group hidden"></div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Fullscreen Lyrics Colors & Glow -->
+      <div class="studio-tab-content fs-tab-content hidden" id="fs-tab-lyrics">
+        <div class="studio-section-title">
+          <span>🎤 Full Screen Lyrics Color Tuning</span>
+          <button class="btn-secondary btn-sm" id="fs-reset-lyrics-colors-btn"><i class="ph ph-arrow-counter-clockwise"></i> Reset Lyrics</button>
+        </div>
+
+        <p class="muted" style="font-size:12px;margin:0 0 14px 0;">Customize active & inactive lyrics colors and glow so words stay crystal-clear over any wallpaper or live video.</p>
+
+        <div class="color-pickers-grid">
+          <div class="color-picker-card">
+            <div class="picker-label-row">
+              <strong>Active Line Color</strong>
+              <span class="color-val" id="val-fs-lyrics-active">#ffffff</span>
+            </div>
+            <div class="picker-input-wrapper">
+              <input type="color" id="picker-fs-lyrics-active" value="#ffffff">
+              <span>Color of the currently sung lyrics line</span>
+            </div>
+          </div>
+
+          <div class="color-picker-card">
+            <div class="picker-label-row">
+              <strong>Active Line Glow</strong>
+              <span class="color-val" id="val-fs-lyrics-glow">#e5a95d</span>
+            </div>
+            <div class="picker-input-wrapper">
+              <input type="color" id="picker-fs-lyrics-glow" value="#e5a95d">
+              <span>Neon radiance around sung lyrics</span>
+            </div>
+          </div>
+
+          <div class="color-picker-card">
+            <div class="picker-label-row">
+              <strong>Upcoming Lines Color</strong>
+              <span class="color-val" id="val-fs-lyrics-inactive">#ffffff</span>
+            </div>
+            <div class="picker-input-wrapper">
+              <input type="color" id="picker-fs-lyrics-inactive" value="#ffffff">
+              <span>Color for surrounding lyrics lines</span>
+            </div>
+          </div>
+
+          <div class="color-picker-card">
+            <div class="picker-label-row">
+              <strong>Lyrics Text Shadow</strong>
+              <span class="color-val" id="val-fs-lyrics-shadow">#000000</span>
+            </div>
+            <div class="picker-input-wrapper">
+              <input type="color" id="picker-fs-lyrics-shadow" value="#000000">
+              <span>Backdrop outline shadow for readability</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lyrics Background Capsule & Opacity -->
+        <div class="slider-controls-group" style="margin-top:16px;">
+          <div class="slider-row">
+            <div class="slider-header">
+              <span>Active Lyrics Capsule Tint Opacity</span>
+              <strong id="val-fs-lyrics-pill-opacity">15%</strong>
+            </div>
+            <input type="range" id="slider-fs-lyrics-pill-opacity" min="0" max="80" value="15">
+          </div>
+          <div class="slider-row">
+            <div class="slider-header">
+              <span>Lyrics Glow Radiance Strength</span>
+              <strong id="val-fs-lyrics-glow-strength">60%</strong>
+            </div>
+            <input type="range" id="slider-fs-lyrics-glow-strength" min="0" max="100" value="60">
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Fullscreen Dimming & Atmosphere Tuning -->
+      <div class="studio-tab-content fs-tab-content hidden" id="fs-tab-atmosphere">
+        <div class="studio-section-title">
+          <span>🌌 Full Screen Visual Atmosphere Tuning</span>
+        </div>
+
+        <div class="toggle-card" style="margin-bottom:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);">
+          <div class="toggle-card-info">
+            <strong>🖥️ True Monitor Fullscreen (Hide Tabs & URL Bar)</strong>
+            <span>Removes browser window headers for 100% full screen & prevents image cropping</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <button type="button" class="btn-secondary btn-sm" id="fs-native-toggle-btn" style="white-space:nowrap;"><i class="ph-bold ph-corners-out"></i> Toggle Now</button>
+            <label class="switch" title="Auto-enter true fullscreen when opening fullscreen player">
+              <input type="checkbox" id="check-fs-auto-native-fullscreen" checked>
+              <span class="slider-switch"></span>
+            </label>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+          <button type="button" class="btn-secondary btn-sm" id="fs-pure-quality-btn" style="color:var(--accent,#e5a95d);border-color:rgba(229,169,93,0.3);"><i class="ph-fill ph-sparkle"></i> ✨ Pure 1:1 Passthrough (Raw Quality)</button>
+          <button type="button" class="btn-secondary btn-sm" id="fs-vivid-boost-btn" style="color:#38bdf8;border-color:rgba(56,189,248,0.3);"><i class="ph-fill ph-palette"></i> 🎨 Vivid Art Boost (Rich Contrast & Saturation)</button>
+        </div>
+
+        <div class="studio-section-title" style="margin-top:14px;font-size:12px;opacity:0.85;">
+          <span>🖼️ Wallpaper Framing & Alignment (Prevent Halo / Head Cutoff)</span>
+        </div>
+        <div class="fs-fit-btn-row" style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+          <button type="button" class="btn-secondary btn-sm fs-fit-btn" data-fit="cover-top" id="fs-fit-cover-top"><i class="ph-bold ph-arrow-up"></i> Top Focus (Keeps Halo & Head)</button>
+          <button type="button" class="btn-secondary btn-sm fs-fit-btn" data-fit="cover-center" id="fs-fit-cover-center"><i class="ph-bold ph-arrows-out-cardinal"></i> Center Focus</button>
+          <button type="button" class="btn-secondary btn-sm fs-fit-btn" data-fit="contain" id="fs-fit-contain"><i class="ph-bold ph-corners-in"></i> Fit Full Artwork (No Crop + Ambient Blur)</button>
+        </div>
+
+        <div class="slider-controls-group">
+          <div class="slider-row" id="fs-custom-pos-row">
+            <div class="slider-header">
+              <span>Vertical Framing / Camera Pan</span>
+              <strong id="val-fs-wallpaper-pos">Top (15%)</strong>
+            </div>
+            <input type="range" id="slider-fs-wallpaper-pos" min="0" max="100" value="15">
+          </div>
+
+          <div class="slider-row">
+            <div class="slider-header">
+              <span>Color Contrast & Dynamic Range</span>
+              <strong id="val-fs-wallpaper-contrast">100%</strong>
+            </div>
+            <input type="range" id="slider-fs-wallpaper-contrast" min="70" max="140" value="100">
+          </div>
+
+          <div class="slider-row">
+            <div class="slider-header">
+              <span>Wallpaper Vibrancy & Saturation</span>
+              <strong id="val-fs-wallpaper-saturation">100%</strong>
+            </div>
+            <input type="range" id="slider-fs-wallpaper-saturation" min="70" max="150" value="100">
+          </div>
+
+          <div class="slider-row">
+            <div class="slider-header">
+              <span>Wallpaper Brightness Exposure</span>
+              <strong id="val-fs-wallpaper-brightness">100%</strong>
+            </div>
+            <input type="range" id="slider-fs-wallpaper-brightness" min="70" max="130" value="100">
+          </div>
+
+          <div class="slider-row">
+            <div class="slider-header">
+              <span>Corner Vignette & Edge Darkness</span>
+              <strong id="val-fs-wallpaper-vignette">0%</strong>
+            </div>
+            <input type="range" id="slider-fs-wallpaper-vignette" min="0" max="100" value="0">
+          </div>
+
+          <div class="slider-row">
+            <div class="slider-header">
+              <span>Full Screen Wallpaper Dimmer</span>
+              <strong id="val-fs-wallpaper-dim">0%</strong>
+            </div>
+            <input type="range" id="slider-fs-wallpaper-dim" min="0" max="90" value="0">
+          </div>
+
+          <div class="slider-row">
+            <div class="slider-header">
+              <span>Full Screen Background Blur Depth</span>
+              <strong id="val-fs-wallpaper-blur">0px</strong>
+            </div>
+            <input type="range" id="slider-fs-wallpaper-blur" min="0" max="40" value="0">
+          </div>
+        </div>
+      </div>
+
+      <div class="dialog-actions" style="display:flex;justify-content:space-between;align-items:center;margin-top:24px;padding-top:16px;border-top:1px solid var(--border);">
+        <button type="button" class="btn-secondary" id="fs-studio-reset-all-btn"><i class="ph ph-arrow-counter-clockwise"></i> Reset Full Screen Defaults</button>
+        <button type="button" class="btn-primary" id="fs-studio-done-btn"><i class="ph-fill ph-check-circle"></i> Apply & Done</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- 50+ Wallpaper Gallery Explorer Modal -->
+  <dialog id="wallpaper-gallery-sheet" class="modal-sheet wallpaper-gallery-modal">
+    <div class="studio-modal-container" style="max-width:960px;">
+      <div class="dialog-header">
+        <div>
+          <p class="eyebrow" style="margin:0;">50+ 4K ARTWORKS & AESTHETICS</p>
+          <h2 style="font-size:24px;margin:4px 0 0;">Wallpaper Gallery Explorer</h2>
+        </div>
+        <button type="button" class="round-action" id="wallpaper-gallery-close"><i class="ph ph-x"></i></button>
+      </div>
+
+      <!-- Category Filter Chips -->
+      <div class="wallpaper-category-chips" id="gallery-category-chips">
+        <button class="cat-chip-btn active" data-cat="all"><i class="ph-fill ph-sparkle"></i> All 50+ Wallpapers</button>
+        <button class="cat-chip-btn" data-cat="anime"><i class="ph-fill ph-game-controller"></i> Anime & Cyberpunk</button>
+        <button class="cat-chip-btn" data-cat="nature"><i class="ph-fill ph-tree"></i> Nature & Scenic</button>
+        <button class="cat-chip-btn" data-cat="space"><i class="ph-fill ph-planet"></i> Space & Sci-Fi</button>
+        <button class="cat-chip-btn" data-cat="minimal"><i class="ph-fill ph-paint-brush"></i> Minimalist & Abstract</button>
+        <button class="cat-chip-btn" data-cat="cozy"><i class="ph-fill ph-coffee"></i> Cozy & Aesthetic</button>
+      </div>
+
+      <!-- Dynamic Gallery Grid with 50+ Artworks -->
+      <div class="gallery-grid" id="full-gallery-grid">
+        <!-- Dynamically populated by renderFullWallpaperGallery() -->
+      </div>
+
+      <div class="dialog-actions" style="margin-top:24px;padding-top:16px;border-top:1px solid var(--border);text-align:right;">
+        <button type="button" class="btn-primary" id="wallpaper-gallery-done-btn"><i class="ph-fill ph-check-circle"></i> Close Gallery</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Full-Screen Audio Player -->
+  <div id="fs-player" class="fs-player" data-mode="vinyl">
+    <canvas id="fs-live-motion-canvas" class="fs-live-wallpaper-video hidden"></canvas>
+    <video id="fs-live-wallpaper-video" class="fs-live-wallpaper-video hidden" autoplay loop muted playsinline></video>
+    <div id="fs-wallpaper-wrap" class="fs-wallpaper-wrap hidden">
+      <div id="fs-wallpaper-ambient-blur" class="fs-wallpaper-ambient-blur hidden"></div>
+      <img id="fs-custom-wallpaper-img" class="fs-custom-wallpaper-img" alt="Fullscreen Wallpaper" crossorigin="anonymous" referrerpolicy="no-referrer" decoding="async" />
+    </div>
+    <div id="fs-custom-wallpaper-bg" class="fs-custom-wallpaper-bg hidden"></div>
+    <div id="fs-wallpaper-dim-overlay" class="fs-wallpaper-dim-overlay"></div>
+    <div class="fs-bg" id="fs-bg-1"></div>
+    <div class="fs-bg" id="fs-bg-2" style="opacity:0;"></div>
+    <div class="fs-bg-overlay"></div>
+    
+    <div class="fs-aura-orbs">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="orb orb-3"></div>
+    </div>
+    
+    <header class="fs-header">
+      <button class="round-action fs-btn" id="fs-close" aria-label="Minimize player"><i class="ph ph-caret-down"></i></button>
+
+      <!-- Floating Quick View Mode Bar -->
+      <nav class="fs-quick-mode-bar" id="fs-quick-mode-bar" role="tablist" aria-label="Visualizer View Mode">
+        <button type="button" class="mode-bar-pill active" data-mode="stage" role="tab" aria-selected="true" title="Split Stage: 3D Jewel Case & Live Lyrics (1)">
+          <i class="ph-bold ph-columns"></i>
+          <span>Stage</span>
+        </button>
+        <button type="button" class="mode-bar-pill" data-mode="vinyl" role="tab" aria-selected="false" title="Audiophile Vinyl Turntable (2)">
+          <i class="ph-fill ph-vinyl-record"></i>
+          <span>Vinyl</span>
+        </button>
+        <button type="button" class="mode-bar-pill" data-mode="retro90s" role="tab" aria-selected="false" title="90s Retro: Winamp EQ & Sony Walkman LCD (3)">
+          <i class="ph-bold ph-cassette-tape"></i>
+          <span>90s Retro</span>
+        </button>
+        <button type="button" class="mode-bar-pill" data-mode="halo" role="tab" aria-selected="false" title="Celestial Halo Soundring (4)">
+          <i class="ph-bold ph-circle-dashed"></i>
+          <span>Halo</span>
+        </button>
+        <button type="button" class="mode-bar-pill" data-mode="clean" role="tab" aria-selected="false" title="Clean Wallpaper Canvas (5)">
+          <i class="ph-bold ph-image"></i>
+          <span>Clean</span>
+        </button>
+      </nav>
+
+      <div class="fs-action-cluster">
+        <button class="round-action fs-btn" id="mode-capsule-trigger" title="Visualizer Studio Hub (All Modes)"><i class="ph-bold ph-squares-four"></i></button>
+        <button class="round-action fs-btn" id="fs-lock-hud-btn" title="Lock Immersive HUD (Double-click screen or Ctrl+Shift+Y to Lock/Unlock)"><i class="ph-bold ph-lock-key-open"></i></button>
+        <button class="round-action fs-btn" id="fs-native-fullscreen-btn" title="True Fullscreen (Hide Browser Tabs & Address Bar for Full Artwork)"><i class="ph-bold ph-corners-out"></i></button>
+        <button class="round-action fs-btn" id="fs-karaoke-btn" title="Karaoke Mode (Real-Time Vocal Remover DSP)"><i class="ph-bold ph-microphone-slash"></i></button>
+        <button class="round-action fs-btn" id="fs-studio-btn" title="Full Screen Customizer & Visual Atmosphere" style="color:var(--accent,#e5a95d);"><i class="ph-fill ph-paint-brush"></i></button>
+        <button class="round-action fs-btn" id="fs-pip-btn" title="Floating Mini Player"><i class="ph ph-picture-in-picture"></i></button>
+        <button class="round-action fs-btn" id="fs-eq-btn" title="Equalizer & 8D Audio"><i class="ph ph-sliders"></i></button>
+      </div>
+    </header>
+
+    <!-- Visualizer Studio Hub Panel -->
+    <div class="fs-visualizer-panel hidden" id="fs-visualizer-panel">
+      <div class="fs-viz-panel-header">
+        <div class="fs-viz-panel-title">
+          <i class="ph-fill ph-sparkle" style="color:var(--accent,#e5a95d);"></i>
+          <span>Visualizer Studio Hub</span>
+          <span class="fs-viz-badge">Curated Modes</span>
+        </div>
+        <button type="button" class="round-action fs-btn btn-sm" id="fs-viz-panel-close" aria-label="Close Visualizer Hub"><i class="ph ph-x"></i></button>
+      </div>
+      
+      <div class="fs-viz-grid-curated">
+        <div class="fs-viz-card active" data-mode="stage">
+          <div class="fs-viz-card-icon"><i class="ph-bold ph-columns"></i></div>
+          <div class="fs-viz-card-meta">
+            <strong>Modern Split Stage</strong>
+            <span>3D CD jewel case + live kinetic lyrics</span>
+          </div>
+        </div>
+        <div class="fs-viz-card" data-mode="vinyl">
+          <div class="fs-viz-card-icon"><i class="ph-fill ph-vinyl-record"></i></div>
+          <div class="fs-viz-card-meta">
+            <strong>Vinyl Turntable</strong>
+            <span>Spinning grooved vinyl with progress ring</span>
+          </div>
+        </div>
+        <div class="fs-viz-card" data-mode="retro90s">
+          <div class="fs-viz-card-icon"><i class="ph-bold ph-cassette-tape"></i></div>
+          <div class="fs-viz-card-meta">
+            <strong>90s Winamp & Walkman</strong>
+            <span>Winamp EQ, Sony Walkman LCD & CRT scanlines</span>
+          </div>
+        </div>
+        <div class="fs-viz-card" data-mode="halo">
+          <div class="fs-viz-card-icon"><i class="ph-bold ph-circle-dashed"></i></div>
+          <div class="fs-viz-card-meta">
+            <strong>Celestial Halo</strong>
+            <span>Orbital translucent audio particle halo</span>
+          </div>
+        </div>
+        <div class="fs-viz-card" data-mode="modern">
+          <div class="fs-viz-card-icon"><i class="ph-bold ph-square"></i></div>
+          <div class="fs-viz-card-meta">
+            <strong>Modern Glass Card</strong>
+            <span>Floating glass album card with reactive backlight</span>
+          </div>
+        </div>
+        <div class="fs-viz-card" data-mode="lyrics">
+          <div class="fs-viz-card-icon"><i class="ph-bold ph-quotes"></i></div>
+          <div class="fs-viz-card-meta">
+            <strong>Karaoke Lyrics</strong>
+            <span>Live synchronized glowing vocal typography</span>
+          </div>
+        </div>
+        <div class="fs-viz-card" data-mode="wave">
+          <div class="fs-viz-card-icon"><i class="ph-bold ph-waveform"></i></div>
+          <div class="fs-viz-card-meta">
+            <strong>Horizon Waveform</strong>
+            <span>Translucent rhythmic frequency spectrum</span>
+          </div>
+        </div>
+        <div class="fs-viz-card" data-mode="aura">
+          <div class="fs-viz-card-icon"><i class="ph-bold ph-aperture"></i></div>
+          <div class="fs-viz-card-meta">
+            <strong>Living Aura</strong>
+            <span>Acoustic sound sphere with bass ripples</span>
+          </div>
+        </div>
+        <div class="fs-viz-card" data-mode="radio">
+          <div class="fs-viz-card-icon"><i class="ph-bold ph-radio"></i></div>
+          <div class="fs-viz-card-meta">
+            <strong>Retro Cassette</strong>
+            <span>Studio tape deck with dual spinning reels</span>
+          </div>
+        </div>
+        <div class="fs-viz-card" data-mode="clean">
+          <div class="fs-viz-card-icon"><i class="ph-bold ph-image"></i></div>
+          <div class="fs-viz-card-meta">
+            <strong>Clean Canvas</strong>
+            <span>100% immersive wallpaper with auto-hide HUD</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <main class="fs-visuals" id="fs-visuals">
+      <!-- Mode: MODERN SPLIT STAGE (Apple Music & Cider Layout) -->
+      <div class="fs-visual-mode" id="mode-stage">
+        <div class="stage-split-grid">
+          <!-- Left: 3D Acrylic CD Jewel Case & Metadata -->
+          <div class="stage-left">
+            <div class="cd-jewel-case-wrap" id="stage-case-wrap">
+              <!-- Peeking Spinning Holographic CD Disc -->
+              <div class="cd-spinning-disc" id="stage-spinning-disc">
+                <div class="cd-disc-rainbow-glare"></div>
+                <div class="cd-disc-grooves"></div>
+                <div class="cd-disc-center-label" id="stage-disc-label">
+                  <img id="stage-disc-art" class="cd-disc-art-img" src="" alt="Disc Label" />
+                  <span id="stage-disc-letter" class="cd-disc-art-letter hidden">🎵</span>
+                </div>
+                <div class="cd-disc-center-hole"></div>
+                <div class="cd-disc-clear-band"></div>
+              </div>
+
+              <!-- 3D Acrylic Jewel Case Cover -->
+              <div class="cd-jewel-case" id="stage-jewel-case">
+                <div class="jewel-spine-hinge">
+                  <div class="jewel-spine-rib top"></div>
+                  <div class="jewel-spine-rib bottom"></div>
+                </div>
+                <div class="jewel-art-container" id="stage-art-container">
+                  <img id="stage-album-art" class="jewel-art-img" src="" alt="Artwork" />
+                  <span id="stage-art-letter" class="jewel-art-letter hidden">🎵</span>
+                </div>
+                <div class="jewel-glare-reflection"></div>
+                <div class="jewel-edge-bevel"></div>
+                <div class="jewel-tray-teeth"></div>
+              </div>
+            </div>
+
+            <div class="stage-meta-card">
+              <div class="stage-badges-row">
+                <span class="audiophile-badge lossless"><i class="ph-fill ph-sparkle"></i> Hi-Res Lossless</span>
+                <span class="audiophile-badge bitdepth"><i class="ph-bold ph-wave-sine"></i> 24-Bit / 192 kHz</span>
+                <span class="audiophile-badge studio">Direct Studio Master</span>
+              </div>
+              <h2 class="stage-track-title" id="stage-track-title">Song Title</h2>
+              <h3 class="stage-track-artist" id="stage-track-artist">Artist Name</h3>
+            </div>
+          </div>
+
+          <!-- Right: Expansive Live Synchronized Lyrics Stream -->
+          <div class="stage-right">
+            <div class="stage-lyrics-stream" id="stage-lyrics-stream">
+              <p class="karaoke-empty">Loading synchronized lyrics...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mode: 90s RETRO (Winamp Spectrum/Oscilloscope + Sony Walkman LCD) -->
+      <div class="fs-visual-mode" id="mode-retro90s">
+        <div class="retro90s-stage">
+          <div class="crt-monitor-frame">
+            <div class="crt-scanlines"></div>
+            <div class="crt-vignette"></div>
+
+            <!-- Top: Sony Walkman STN Olive LCD Display -->
+            <div class="walkman-lcd-deck">
+              <div class="walkman-brand-strip">
+                <span class="walkman-brand-logo">SONY</span>
+                <span class="walkman-brand-model">DISCMAN • COMPACT DISC PLAYER D-E305</span>
+                <span class="walkman-brand-extra">1-BIT DAC • DIGITAL AUDIO</span>
+              </div>
+              <div class="walkman-lcd-screen">
+                <div class="lcd-badge-row">
+                  <span class="lcd-badge active" id="lcd-badge-esp">ESP 45SEC</span>
+                  <span class="lcd-badge active" id="lcd-badge-bass">MEGA BASS</span>
+                  <span class="lcd-badge active" id="lcd-badge-avls">AVLS</span>
+                  <span class="lcd-badge" id="lcd-badge-shuffle">SHUFFLE</span>
+                  <span class="lcd-badge" id="lcd-badge-repeat">REPEAT 1</span>
+                  <span class="lcd-badge active">BATT [▮▮▮]</span>
+                </div>
+                <div class="lcd-main-display">
+                  <div class="lcd-esp-gauge">
+                    <svg class="esp-disc-svg" viewBox="0 0 44 44">
+                      <circle class="esp-ring-bg" cx="22" cy="22" r="18" />
+                      <circle class="esp-ring-fill" id="walkman-esp-fill" cx="22" cy="22" r="18" />
+                      <g class="esp-spinning-disc" id="walkman-spin-disc">
+                        <circle cx="22" cy="22" r="6" fill="#1b2518" />
+                        <line x1="22" y1="4" x2="22" y2="40" stroke="#8d9b84" stroke-width="1.6" />
+                        <line x1="4" y1="22" x2="40" y2="22" stroke="#8d9b84" stroke-width="1.6" />
+                      </g>
+                    </svg>
+                    <span class="lcd-label">ESP BUFFER</span>
+                  </div>
+                  <div class="lcd-readout">
+                    <div class="lcd-readout-col">
+                      <span class="lcd-dim-ghost">88</span>
+                      <span class="lcd-active-text" id="walkman-track-no">01</span>
+                      <span class="lcd-sub-label">TRACK</span>
+                    </div>
+                    <div class="lcd-readout-col">
+                      <span class="lcd-dim-ghost">88:88</span>
+                      <span class="lcd-active-text" id="walkman-time-code">00:00</span>
+                      <span class="lcd-sub-label">MIN : SEC</span>
+                    </div>
+                  </div>
+                </div>
+                <!-- Scrolling CD-Text Digital Ticker -->
+                <div class="walkman-ticker-wrap">
+                  <span class="walkman-ticker-icon"><i class="ph-bold ph-broadcast"></i></span>
+                  <div class="walkman-ticker-track">
+                    <span class="walkman-ticker-txt" id="walkman-ticker-txt">NO DISC • LINUS DIGITAL AUDIO COMPACT PLAYER</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tactile Hardware Buttons -->
+              <div class="walkman-controls-strip">
+                <button type="button" class="walkman-tactile-btn active" id="btn-walkman-megabass" title="Toggle Mega Bass Boost"><span>MEGA BASS</span></button>
+                <button type="button" class="walkman-tactile-btn active" id="btn-walkman-esp" title="Toggle ESP Shock Protection"><span>ESP 45S</span></button>
+                <button type="button" class="walkman-tactile-btn" id="btn-walkman-avls" title="Toggle Automatic Volume Limiter"><span>AVLS</span></button>
+              </div>
+            </div>
+
+            <!-- Bottom: Winamp 2.x Spectrum Analyzer & Oscilloscope Box -->
+            <div class="winamp-viz-box">
+              <div class="winamp-header-bar">
+                <div class="winamp-title-cluster">
+                  <i class="ph-bold ph-lightning" style="color:#00ff41;"></i>
+                  <span class="winamp-title-txt">WINAMP 2.9 AUDIO ENGINE</span>
+                  <span class="winamp-meta-kbps" id="winamp-kbps">320 KBPS • 44.1 KHZ STEREO</span>
+                </div>
+                <div class="winamp-mode-toggle">
+                  <button type="button" id="winamp-mode-spec" class="winamp-chip active" title="16-Band LED Spectrum with Gravity Peak Drop">SPECTRUM</button>
+                  <button type="button" id="winamp-mode-osc" class="winamp-chip" title="Green Phosphor CRT Waveform Oscilloscope">OSC</button>
+                </div>
+              </div>
+              <canvas id="winamp-canvas" class="winamp-canvas" width="560" height="220"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mode: VINYL -->
+      <div class="fs-visual-mode" id="mode-vinyl">
+        <div class="fs-disk-container" id="fs-disk-container">
+          <svg class="fs-progress-ring" viewBox="0 0 320 320">
+            <circle class="fs-ring-bg" cx="160" cy="160" r="150" />
+            <circle class="fs-ring-fill" id="fs-ring-fill" cx="160" cy="160" r="150" />
+          </svg>
+          <div class="fs-disk" id="fs-disk">
+            <div class="fs-disk-gloss"></div>
+            <div class="fs-vinyl-grooves"></div>
+            <div class="fs-disk-art" id="fs-disk-art">
+              <span id="fs-disk-letter" style="font-size: 72px; font-weight: bold; color: rgba(255,255,255,0.2);"></span>
+            </div>
+            <div class="fs-disk-hole"></div>
+          </div>
+          <!-- Turntable Tonearm with Stylus -->
+          <div class="fs-tonearm-assembly" id="fs-tonearm">
+            <div class="tonearm-base"></div>
+            <div class="tonearm-pivot"></div>
+            <div class="tonearm-arm"></div>
+            <div class="tonearm-headshell">
+              <div class="tonearm-cartridge"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Mode: MODERN -->
+      <div class="fs-visual-mode" id="mode-modern">
+        <div class="fs-modern-art" id="fs-modern-art">
+          <span id="fs-modern-letter" style="font-size: 96px; font-weight: bold; color: rgba(255,255,255,0.3);"></span>
+        </div>
+      </div>
+
+      <!-- Mode: RADIO -->
+      <div class="fs-visual-mode" id="mode-radio">
+        <div class="fs-radio-deck">
+          <div class="deck-window">
+            <div class="reel reel-left"><div class="spoke"></div></div>
+            <div class="tape-bridge"></div>
+            <div class="reel reel-right"><div class="spoke"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mode: HORIZON WAVEFORM -->
+      <div class="fs-visual-mode" id="mode-wave">
+        <div class="fs-wave-bars">
+          <div class="wave-bar" style="animation-delay: 0.1s"></div>
+          <div class="wave-bar" style="animation-delay: 0.2s"></div>
+          <div class="wave-bar" style="animation-delay: 0.3s"></div>
+          <div class="wave-bar" style="animation-delay: 0.4s"></div>
+          <div class="wave-bar" style="animation-delay: 0.5s"></div>
+          <div class="wave-bar" style="animation-delay: 0.6s"></div>
+          <div class="wave-bar" style="animation-delay: 0.7s"></div>
+          <div class="wave-bar" style="animation-delay: 0.8s"></div>
+          <div class="wave-bar" style="animation-delay: 0.9s"></div>
+          <div class="wave-bar" style="animation-delay: 1.0s"></div>
+          <div class="wave-bar" style="animation-delay: 1.1s"></div>
+          <div class="wave-bar" style="animation-delay: 1.2s"></div>
+          <div class="wave-bar" style="animation-delay: 1.3s"></div>
+          <div class="wave-bar" style="animation-delay: 1.4s"></div>
+          <div class="wave-bar" style="animation-delay: 1.5s"></div>
+          <div class="wave-bar" style="animation-delay: 1.6s"></div>
+        </div>
+      </div>
+
+      <!-- Mode: AURA (Ambient Sound Sphere) -->
+      <div class="fs-visual-mode" id="mode-aura">
+        <div class="fs-aura-center">
+          <div class="aura-wave-circle wave-1"></div>
+          <div class="aura-wave-circle wave-2"></div>
+          <div class="aura-wave-circle wave-3"></div>
+          <div class="aura-core-sphere" id="fs-aura-core">
+            <div class="aura-inner-glow"></div>
+            <i class="ph-fill ph-sparkle"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mode: CELESTIAL HALO (Translucent Harmonic Sound Ring) -->
+      <div class="fs-visual-mode" id="mode-halo">
+        <canvas id="fs-halo-canvas" class="fs-halo-canvas"></canvas>
+      </div>
+
+      <!-- Mode: LYRICS (Live Synced Karaoke) -->
+      <div class="fs-visual-mode" id="mode-lyrics">
+        <div class="fs-karaoke-stage" id="fs-karaoke-stage">
+          <div class="fs-karaoke-stream" id="fs-karaoke-stream">
+            <p class="karaoke-empty">Loading synchronized lyrics...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mode: CLEAN (Pure Uncluttered Wallpaper Canvas) -->
+      <div class="fs-visual-mode" id="mode-clean"></div>
+    </main>
+    
+    <!-- Unified Floating Glass Island Dock -->
+    <footer class="fs-dock-island" id="fs-dock-island">
+      <!-- Left: Track Metadata & Heart -->
+      <div class="fs-dock-left">
+        <div class="fs-dock-art-wrap" id="fs-mini-art-wrap">
+          <div class="fs-dock-art" id="fs-mini-art">🎵</div>
+          <div class="fs-dock-art-ring"></div>
+        </div>
+        <div class="fs-dock-info">
+          <div class="fs-dock-title-marquee">
+            <h1 class="fs-dock-title" id="fs-title">Song Title</h1>
+          </div>
+          <h2 class="fs-dock-artist" id="fs-artist">Artist Name</h2>
+        </div>
+        <button class="fs-dock-btn" id="fs-like" title="Favorite this track" aria-label="Favorite">
+          <i class="ph ph-star"></i>
+        </button>
+      </div>
+
+      <!-- Center: Always-Visible Primary Transport Controls -->
+      <div class="fs-dock-center">
+        <button class="fs-dock-btn" id="fs-shuffle" title="Shuffle" aria-label="Shuffle">
+          <i class="ph ph-shuffle"></i>
+        </button>
+        <button class="fs-dock-btn fs-dock-prev" id="fs-prev" title="Previous (Left Arrow)" aria-label="Previous">
+          <i class="ph-fill ph-skip-back"></i>
+        </button>
+        <button class="fs-dock-play" id="fs-play" title="Play/Pause (Space)" aria-label="Play or Pause">
+          <i class="ph-fill ph-play"></i>
+        </button>
+        <button class="fs-dock-btn fs-dock-next" id="fs-next" title="Next (Right Arrow)" aria-label="Next">
+          <i class="ph-fill ph-skip-forward"></i>
+        </button>
+        <button class="fs-dock-btn" id="fs-repeat" title="Repeat Mode" aria-label="Repeat">
+          <i class="ph ph-repeat"></i>
+        </button>
+      </div>
+
+      <!-- Right: Interactive Timeline Scrubber & Quick Tools -->
+      <div class="fs-dock-right">
+        <span class="fs-time-txt" id="fs-time-current">0:00</span>
+        <div class="fs-progress-bar-wrapper" id="fs-progress-bar-wrapper" title="Click or drag to seek">
+          <div class="fs-progress-bar-track">
+            <div class="fs-progress-bar-fill" id="fs-progress-bar-fill"></div>
+          </div>
+        </div>
+        <span class="fs-time-txt" id="fs-time-total">0:00</span>
+        
+        <div class="fs-dock-actions">
+          <button class="fs-dock-btn" id="fs-radio-btn" title="Start Radio from this track" aria-label="Start Track Radio">
+            <i class="ph-bold ph-radio"></i>
+          </button>
+          <button class="fs-dock-btn" id="fs-autodj-btn" title="Toggle Smart Auto-DJ Crossfader (D)" aria-label="Toggle Auto-DJ">
+            <i class="ph-bold ph-headphones"></i>
+          </button>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <!-- Floating Auto-DJ Beat-Matched Transition Indicator Pill -->
+  <div class="autodj-blending-pill" id="autodj-blending-pill">
+    <i class="ph-bold ph-disc dj-spin-icon"></i>
+    <span id="autodj-blending-text">Auto-DJ Blending • 120 → 124 BPM</span>
+  </div>
+
+  <audio id="audio"></audio>
+  <audio id="audio-deck-b"></audio>
+
+  <script src="/static/dj_engine.js?v=1.2"></script>
+  <script src="/static/dj_ui.js?v=1.2"></script>
+  <script src="/static/app.js?v=8.0"></script>
+  <script src="/static/tour.js?v=1.0"></script>
+</body>
+</html>

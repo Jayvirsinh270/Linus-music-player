@@ -1,0 +1,579 @@
+/* ============================================================
+   Linus Music Player — Interactive Feature Tour & Onboarding
+   Aesthetic Glassmorphism, Dynamic Spotlight, Responsive Tooltips
+============================================================ */
+
+/* ---- Fullscreen Tour Overlay & Backdrop ---- */
+.linus-tour-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99990;
+  pointer-events: auto;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.linus-tour-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Dynamic Spotlight Aperture */
+.linus-tour-spotlight {
+  position: fixed;
+  border-radius: 16px;
+  pointer-events: none;
+  /* Giant surrounding shadow forms the dark backdrop, leaving target element spotlighted */
+  box-shadow: 0 0 0 9999px rgba(7, 6, 10, 0.82), 
+              0 0 30px 4px var(--accent-glow, rgba(229, 169, 93, 0.45)),
+              inset 0 0 15px rgba(255, 255, 255, 0.1);
+  border: 2px solid var(--accent, #e5a95d);
+  transition: top 0.38s cubic-bezier(0.2, 0.9, 0.3, 1),
+              left 0.38s cubic-bezier(0.2, 0.9, 0.3, 1),
+              width 0.38s cubic-bezier(0.2, 0.9, 0.3, 1),
+              height 0.38s cubic-bezier(0.2, 0.9, 0.3, 1),
+              border-radius 0.38s cubic-bezier(0.2, 0.9, 0.3, 1);
+  animation: tourSpotlightPulse 2.8s infinite ease-in-out;
+  z-index: 99991;
+}
+
+@keyframes tourSpotlightPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 9999px rgba(7, 6, 10, 0.82), 
+                0 0 25px 3px var(--accent-glow, rgba(229, 169, 93, 0.4)),
+                inset 0 0 12px rgba(255, 255, 255, 0.08);
+  }
+  50% {
+    box-shadow: 0 0 0 9999px rgba(7, 6, 10, 0.84), 
+                0 0 38px 8px var(--accent-glow, rgba(229, 169, 93, 0.65)),
+                inset 0 0 20px rgba(255, 255, 255, 0.18);
+  }
+}
+
+/* ---- Floating Tour Tooltip Card ---- */
+.linus-tour-card {
+  position: fixed;
+  z-index: 99999;
+  width: 420px;
+  max-width: calc(100vw - 32px);
+  background: var(--surface-glass, rgba(23, 18, 14, 0.92));
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-top: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 22px;
+  padding: 24px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.7),
+              0 0 40px var(--accent-glow, rgba(229, 169, 93, 0.2));
+  color: var(--text, #fdf6ec);
+  font-family: var(--font-sans, 'Outfit', sans-serif);
+  opacity: 0;
+  transform: translateY(12px) scale(0.97);
+  pointer-events: auto;
+  transition: top 0.38s cubic-bezier(0.2, 0.9, 0.3, 1),
+              left 0.38s cubic-bezier(0.2, 0.9, 0.3, 1),
+              opacity 0.28s ease,
+              transform 0.28s ease;
+}
+
+.linus-tour-card.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* Card Header */
+.tour-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.tour-header-badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tour-step-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--accent-glow, rgba(229, 169, 93, 0.2));
+  border: 1px solid var(--accent, #e5a95d);
+  color: var(--accent, #e5a95d);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.tour-category-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-muted, #9e8d7c);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.tour-close-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text-muted, #9e8d7c);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.tour-close-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  color: var(--text, #fff);
+  transform: rotate(90deg);
+}
+
+/* Card Body */
+.tour-card-body {
+  margin-bottom: 18px;
+}
+
+.tour-title {
+  font-family: var(--font-serif, 'Instrument Serif', serif);
+  font-size: 24px;
+  line-height: 1.25;
+  color: var(--text, #fdf6ec);
+  margin: 0 0 10px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tour-title i {
+  color: var(--accent, #e5a95d);
+  font-size: 24px;
+}
+
+.tour-desc {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-muted, #9e8d7c);
+  margin: 0 0 14px 0;
+}
+
+.tour-desc strong {
+  color: var(--text, #fdf6ec);
+  font-weight: 600;
+}
+
+/* Pro Tip / Shortcut Pill */
+.tour-tip-pill {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--text, #fdf6ec);
+}
+
+.tour-tip-pill i {
+  color: var(--accent, #e5a95d);
+  font-size: 16px;
+  margin-top: 1px;
+  flex-shrink: 0;
+}
+
+/* Progress Bar */
+.tour-progress-bar-wrap {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+
+.tour-progress-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--accent, #e5a95d), #f59e0b);
+  border-radius: 999px;
+  transition: width 0.35s ease;
+}
+
+/* Card Actions */
+.tour-card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.tour-action-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tour-action-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tour-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 9px 16px;
+  border-radius: 12px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  border: none;
+  font-family: inherit;
+}
+
+.tour-btn-primary {
+  background: var(--accent, #e5a95d);
+  color: #120e0a;
+  box-shadow: 0 4px 16px var(--accent-glow, rgba(229, 169, 93, 0.35));
+}
+
+.tour-btn-primary:hover {
+  filter: brightness(1.12);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px var(--accent-glow, rgba(229, 169, 93, 0.5));
+}
+
+.tour-btn-secondary {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text, #fdf6ec);
+}
+
+.tour-btn-secondary:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+.tour-btn-secondary:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.tour-btn-ghost {
+  background: transparent;
+  color: var(--text-muted, #9e8d7c);
+  padding: 8px 12px;
+  font-size: 12.5px;
+}
+
+.tour-btn-ghost:hover {
+  color: var(--text, #fdf6ec);
+}
+
+/* Keyboard hint in card footer */
+.tour-kbd-hints {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 11px;
+  color: var(--text-muted, #9e8d7c);
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.tour-kbd-hint-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tour-kbd {
+  display: inline-block;
+  padding: 1px 5px;
+  background: rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  font-size: 10px;
+  font-family: monospace;
+  color: var(--text, #fdf6ec);
+}
+
+/* ============================================================
+   Tour Welcome & Completion Dialog Modals
+============================================================ */
+.linus-tour-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 99995;
+  background: rgba(4, 4, 7, 0.85);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.32s ease, visibility 0.32s ease;
+}
+
+.linus-tour-modal-backdrop.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.linus-tour-dialog {
+  background: var(--surface-glass, rgba(23, 18, 14, 0.94));
+  backdrop-filter: blur(32px) saturate(190%);
+  -webkit-backdrop-filter: blur(32px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-top: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 28px;
+  max-width: 580px;
+  width: 100%;
+  padding: 38px 34px;
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.85),
+              0 0 50px var(--accent-glow, rgba(229, 169, 93, 0.25));
+  color: var(--text, #fdf6ec);
+  font-family: var(--font-sans, 'Outfit', sans-serif);
+  text-align: center;
+  transform: scale(0.94) translateY(16px);
+  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.linus-tour-modal-backdrop.active .linus-tour-dialog {
+  transform: scale(1) translateY(0);
+}
+
+/* Ambient glow accent behind dialog */
+.linus-tour-dialog::before {
+  content: '';
+  position: absolute;
+  top: -80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 320px;
+  height: 180px;
+  background: var(--accent-glow, rgba(229, 169, 93, 0.35));
+  filter: blur(60px);
+  pointer-events: none;
+  border-radius: 50%;
+  z-index: 0;
+}
+
+.linus-tour-dialog-inner {
+  position: relative;
+  z-index: 1;
+}
+
+/* Big Hero Vinyl Icon */
+.tour-welcome-icon-wrap {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 20px auto;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.03));
+  border: 1px solid var(--accent, #e5a95d);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 30px var(--accent-glow, rgba(229, 169, 93, 0.45));
+}
+
+.tour-welcome-icon-wrap i {
+  font-size: 42px;
+  color: var(--accent, #e5a95d);
+  animation: tourSpinVinyl 12s linear infinite;
+}
+
+@keyframes tourSpinVinyl {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.tour-welcome-title {
+  font-family: var(--font-serif, 'Instrument Serif', serif);
+  font-size: 38px;
+  line-height: 1.15;
+  margin: 0 0 8px 0;
+  color: var(--text, #fdf6ec);
+}
+
+.tour-welcome-title em {
+  color: var(--accent, #e5a95d);
+  font-style: italic;
+}
+
+.tour-welcome-subtitle {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-muted, #9e8d7c);
+  margin: 0 auto 24px auto;
+  max-width: 480px;
+}
+
+/* Feature Showcase Grid inside Welcome */
+.tour-feature-highlights-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  text-align: left;
+  margin-bottom: 28px;
+}
+
+.tour-highlight-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  transition: background 0.2s ease;
+}
+
+.tour-highlight-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.tour-highlight-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--accent-glow, rgba(229, 169, 93, 0.2));
+  border: 1px solid var(--accent, #e5a95d);
+  color: var(--accent, #e5a95d);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.tour-highlight-text strong {
+  display: block;
+  font-size: 13.5px;
+  color: var(--text, #fdf6ec);
+  margin-bottom: 2px;
+}
+
+.tour-highlight-text span {
+  display: block;
+  font-size: 11.5px;
+  line-height: 1.35;
+  color: var(--text-muted, #9e8d7c);
+}
+
+/* Modal Bottom Actions */
+.tour-modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
+.tour-welcome-start-btn {
+  width: 100%;
+  padding: 14px 24px;
+  border-radius: 16px;
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: var(--accent, #e5a95d);
+  color: #120e0a;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 6px 24px var(--accent-glow, rgba(229, 169, 93, 0.4));
+  transition: all 0.25s ease;
+}
+
+.tour-welcome-start-btn:hover {
+  filter: brightness(1.12);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px var(--accent-glow, rgba(229, 169, 93, 0.6));
+}
+
+.tour-welcome-skip-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted, #9e8d7c);
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.tour-welcome-skip-btn:hover {
+  color: var(--text, #fdf6ec);
+  text-decoration: underline;
+}
+
+.tour-revisit-note {
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--text-muted, #9e8d7c);
+  opacity: 0.8;
+}
+
+/* ============================================================
+   Mobile & Responsive Adaptations
+============================================================ */
+@media (max-width: 640px) {
+  .linus-tour-card {
+    width: calc(100vw - 28px);
+    padding: 18px;
+    border-radius: 18px;
+  }
+  
+  .tour-title {
+    font-size: 20px;
+  }
+  
+  .tour-desc {
+    font-size: 13px;
+  }
+  
+  .tour-feature-highlights-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  
+  .linus-tour-dialog {
+    padding: 26px 20px;
+    border-radius: 22px;
+  }
+  
+  .tour-welcome-title {
+    font-size: 28px;
+  }
+}

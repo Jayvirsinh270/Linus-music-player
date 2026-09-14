@@ -1,0 +1,84 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/*
+!downloads/.gitkeep
+
+# Lyrics cache
+lyrics_cache/*
+!lyrics_cache/.gitkeep
+
+# Audio stream cache
+stream_cache/*
+!stream_cache/.gitkeep
+
+# Wallpapers & Custom user media
+static/wallpapers/*
+!static/wallpapers/.gitkeep
+static/live_wallpapers/*
+!static/live_wallpapers/.gitkeep
+static/videos/*
+!static/videos/.gitkeep
+
+# SQLite database & runtime state
+linus.db
+linus.db-*
+*.sqlite
+*.sqlite3
+*.db
+*.db-shm
+*.db-wal
+*.db-journal
+linus_state.json
+linus_state.json.bak
+linus_state*.json
+
+# Environment variables & secrets
+.env
+.env.*
+!.env.example
+*.env
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+ehthumbs.db
+ehthumbs_vista.db
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+
+# Logs
+*.log
+logs/
+
+# Temporary / Scratch files
+scratch/
+tmp/
+temp/
