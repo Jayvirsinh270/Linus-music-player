@@ -26,34 +26,83 @@ class TrackTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final player = context.watch<PlayerProvider>();
     final isFav = player.isFavorite(track.id);
+    final isPlayingThis = isCurrent && player.isPlaying;
+    final isBufferingThis = isCurrent && player.isBuffering;
 
-    return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      onTap: onTap ?? () => player.playTrack(track),
-      leading: ClipRRect(
-        borderRadius: BorderRadius.circular(8),
-        child: SizedBox(
-          width: 50,
-          height: 50,
-          child: track.thumbnailUrl.isNotEmpty
-              ? CachedNetworkImage(
-                  imageUrl: track.thumbnailUrl,
-                  fit: BoxFit.cover,
-                  placeholder: (_, __) => Container(
-                    color: Colors.grey.shade900,
-                    child: const Icon(Icons.music_note, color: Colors.grey),
-                  ),
-                  errorWidget: (_, __, ___) => Container(
-                    color: Colors.grey.shade900,
-                    child: const Icon(Icons.music_note, color: Colors.grey),
-                  ),
-                )
-              : Container(
-                  color: Colors.grey.shade900,
-                  child: const Icon(Icons.music_note, color: Colors.grey),
-                ),
-        ),
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+      decoration: BoxDecoration(
+        color: isCurrent
+            ? Theme.of(context).colorScheme.primary.withOpacity(0.1)
+            : Colors.transparent,
+        borderRadius: BorderRadius.circular(12),
+        border: isCurrent
+            ? Border.all(
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                width: 1,
+              )
+            : null,
       ),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        onTap: onTap ?? () => player.playTrack(track),
+        leading: ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: SizedBox(
+            width: 50,
+            height: 50,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                track.thumbnailUrl.isNotEmpty
+                    ? CachedNetworkImage(
+                        imageUrl: track.thumbnailUrl,
+                        fit: BoxFit.cover,
+                        placeholder: (_, __) => Container(
+                          color: Colors.grey.shade900,
+                          child: const Icon(Icons.music_note, color: Colors.grey),
+                        ),
+                        errorWidget: (_, __, ___) => Container(
+                          color: Colors.grey.shade900,
+                          child: const Icon(Icons.music_note, color: Colors.grey),
+                        ),
+                      )
+                    : Container(
+                        color: Colors.grey.shade900,
+                        child: const Icon(Icons.music_note, color: Colors.grey),
+                      ),
+                if (isBufferingThis)
+                  Container(
+                    color: Colors.black54,
+                    child: Center(
+                      child: SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.2,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                    ),
+                  )
+                else if (isPlayingThis)
+                  Container(
+                    color: Colors.black45,
+                    child: const Center(
+                      child: _MiniEqualizer(),
+                    ),
+                  )
+                else if (isCurrent)
+                  Container(
+                    color: Colors.black45,
+                    child: const Center(
+                      child: Icon(Icons.pause_rounded, color: Colors.white, size: 22),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
       title: Text(
         track.title,
         maxLines: 1,
@@ -156,6 +205,66 @@ class TrackTile extends StatelessWidget {
             ),
           ),
         ],
+      ),
+      ),
+    );
+  }
+}
+
+class _MiniEqualizer extends StatefulWidget {
+  const _MiniEqualizer();
+
+  @override
+  State<_MiniEqualizer> createState() => _MiniEqualizerState();
+}
+
+class _MiniEqualizerState extends State<_MiniEqualizer>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 650),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            _bar(8 + _controller.value * 12),
+            const SizedBox(width: 2.5),
+            _bar(18 - _controller.value * 10),
+            const SizedBox(width: 2.5),
+            _bar(10 + _controller.value * 11),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _bar(double height) {
+    return Container(
+      width: 3.5,
+      height: height.clamp(4.0, 22.0),
+      decoration: BoxDecoration(
+        color: const Color(0xFF2DD4BF),
+        borderRadius: BorderRadius.circular(2),
       ),
     );
   }

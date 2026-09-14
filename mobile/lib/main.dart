@@ -1,4 +1,5 @@
 import 'package:audio_service/audio_service.dart';
+import 'package:audio_session/audio_session.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -21,6 +22,14 @@ void main() async {
     ),
   );
 
+  // Configure AudioSession for music playback on Android
+  try {
+    final session = await AudioSession.instance;
+    await session.configure(const AudioSessionConfiguration.music());
+  } catch (_) {
+    // AudioSession configuration fallback
+  }
+
   final ytService = YouTubeService();
   final recEngine = RecommendationEngine(ytService);
   await recEngine.init();
@@ -32,7 +41,7 @@ void main() async {
       androidNotificationChannelId: 'com.linus.musicplayer.audio',
       androidNotificationChannelName: 'Linus Music Playback',
       androidNotificationOngoing: true,
-      androidStopForegroundOnPause: true,
+      androidStopForegroundOnPause: false,
     ),
   );
 

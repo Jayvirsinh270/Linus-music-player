@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -11,6 +13,9 @@ enum PlaybackRepeatMode { off, all, one }
 class PlayerProvider extends ChangeNotifier {
   final LinusAudioHandler _audioHandler;
   final RecommendationEngine _recEngine;
+
+  final StreamController<String> _errorController = StreamController<String>.broadcast();
+  Stream<String> get errorStream => _errorController.stream;
 
   Track? _currentTrack;
   final List<Track> _queue = [];
@@ -42,6 +47,7 @@ class PlayerProvider extends ChangeNotifier {
   Duration get duration => _duration;
   bool get isShuffle => _isShuffle;
   PlaybackRepeatMode get repeatMode => _repeatMode;
+  double get volume => _audioHandler.volume;
 
   bool isFavorite(String trackId) => _favorites.any((t) => t.id == trackId);
 
@@ -49,6 +55,23 @@ class PlayerProvider extends ChangeNotifier {
     // Audio handler completion hook
     _audioHandler.onTrackCompleted = () {
       _handleTrackEnd();
+    };
+
+    // External hardware/notification button hooks
+    _audioHandler.onSkipNext = () {
+      skipNext();
+    };
+
+    _audioHandler.onSkipPrevious = () {
+      skipPrevious();
+    };
+
+    // Playback error hook - surface error and auto-skip smoothly
+    _audioHandler.onPlaybackError = (track, message) {
+      _isBuffering = false;
+      _errorController.add("Playback error: ${track.title}. Skipping...");
+      notifyListeners();
+      skipNext();
     };
 
     // Position updates
@@ -65,11 +88,24 @@ class PlayerProvider extends ChangeNotifier {
       }
     });
 
-    // Player state updates (play/pause/buffer)
+    // PlaybackState updates from audio_service (catches loading state during network calls)
+    _audioHandler.playbackState.listen((state) {
+      final isStateBuffering = state.processingState == AudioProcessingState.buffering ||
+          state.processingState == AudioProcessingState.loading;
+      if (_isBuffering != isStateBuffering) {
+        _isBuffering = isStateBuffering;
+        notifyListeners();
+      }
+    });
+
+    // Player state updates (play/pause)
     _audioHandler.playerStateStream.listen((state) {
       _isPlaying = state.playing;
-      _isBuffering = state.processingState == ProcessingState.buffering ||
+      final isPlayerBuffering = state.processingState == ProcessingState.buffering ||
           state.processingState == ProcessingState.loading;
+      if (_isBuffering != isPlayerBuffering && !isPlayerBuffering) {
+        _isBuffering = false;
+      }
       notifyListeners();
     });
   }
@@ -125,6 +161,7 @@ class PlayerProvider extends ChangeNotifier {
     }
 
     _trackStartTime = DateTime.now();
+    _isBuffering = true;
     notifyListeners();
 
     await _audioHandler.playTrack(track);
@@ -232,5 +269,16 @@ class PlayerProvider extends ChangeNotifier {
       _repeatMode = PlaybackRepeatMode.off;
     }
     notifyListeners();
+  }
+
+  Future<void> setVolume(double val) async {
+    await _audioHandler.setVolume(val.clamp(0.0, 1.0));
+    notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _errorController.close();
+    super.dispose();
   }
 }

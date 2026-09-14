@@ -356,6 +356,45 @@ class _PlayerScreenState extends State<PlayerScreen> {
                   ),
                 ],
               ),
+              const SizedBox(height: 12),
+              // Volume Control
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Row(
+                  children: [
+                    Icon(
+                      player.volume == 0
+                          ? Icons.volume_off_rounded
+                          : Icons.volume_down_rounded,
+                      size: 20,
+                      color: Colors.grey.shade500,
+                    ),
+                    Expanded(
+                      child: SliderTheme(
+                        data: SliderTheme.of(context).copyWith(
+                          trackHeight: 3,
+                          thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 5),
+                          overlayShape: const RoundSliderOverlayShape(overlayRadius: 10),
+                          activeTrackColor: Theme.of(context).colorScheme.primary.withOpacity(0.8),
+                          inactiveTrackColor: Colors.white12,
+                          thumbColor: Theme.of(context).colorScheme.primary,
+                        ),
+                        child: Slider(
+                          value: player.volume,
+                          min: 0.0,
+                          max: 1.0,
+                          onChanged: (val) => player.setVolume(val),
+                        ),
+                      ),
+                    ),
+                    Icon(
+                      Icons.volume_up_rounded,
+                      size: 20,
+                      color: Colors.grey.shade500,
+                    ),
+                  ],
+                ),
+              ),
               const Spacer(),
             ],
           ),

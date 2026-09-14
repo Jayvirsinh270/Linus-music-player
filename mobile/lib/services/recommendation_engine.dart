@@ -101,13 +101,16 @@ class RecommendationEngine {
 
   Future<List<Track>> getSuggestedPicks() async {
     if (_recentHistory.isEmpty) {
-      // Default curated starter seeds for new users
-      return _ytService.searchTracks('Top Hits Music 2026');
+      final trending = await _ytService.getTrendingTracks();
+      if (trending.isNotEmpty) return trending;
+      return _ytService.searchTracks('Top Music Hits');
     }
 
-    // Pick a favorite artist or recent track to seed suggestions
     final seedTrack = _recentHistory.first;
     final suggestions = await _ytService.getRelatedTracks(seedTrack.id);
-    return suggestions.take(10).toList();
+    if (suggestions.isNotEmpty) {
+      return suggestions.take(15).toList();
+    }
+    return _ytService.getTrendingTracks();
   }
 }

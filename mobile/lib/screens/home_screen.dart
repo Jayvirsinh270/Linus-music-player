@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/track.dart';
@@ -22,7 +24,9 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<Track> _suggestedTracks = [];
+  List<Track> _trendingTracks = [];
   bool _isLoading = true;
+  StreamSubscription<String>? _errorSub;
 
   final List<String> _quickVibes = [
     'Chill Lofi',
@@ -36,17 +40,50 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _loadRecommendations();
+    _loadAllContent();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final player = context.read<PlayerProvider>();
+      _errorSub = player.errorStream.listen((msg) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(msg),
+              backgroundColor: const Color(0xFFDC2626),
+              behavior: SnackBarBehavior.floating,
+              duration: const Duration(seconds: 4),
+            ),
+          );
+        }
+      });
+    });
   }
 
-  Future<void> _loadRecommendations() async {
+  @override
+  void dispose() {
+    _errorSub?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _loadAllContent() async {
     setState(() => _isLoading = true);
-    final picks = await widget.recEngine.getSuggestedPicks();
-    if (mounted) {
-      setState(() {
-        _suggestedTracks = picks;
-        _isLoading = false;
-      });
+    try {
+      final results = await Future.wait([
+        widget.recEngine.getSuggestedPicks(),
+        widget.ytService.getTrendingTracks(),
+      ]);
+
+      if (mounted) {
+        setState(() {
+          _suggestedTracks = results[0];
+          _trendingTracks = results[1];
+          _isLoading = false;
+        });
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -133,6 +170,38 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
+              // Trending Section Carousel
+              if (_trendingTracks.isNotEmpty) ...[
+                const SliverToBoxAdapter(
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(20, 24, 20, 12),
+                    child: Text(
+                      'Trending Today',
+                      style: TextStyle(
+                        fontSize: 19,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: SizedBox(
+                    height: 205,
+                    child: ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      scrollDirection: Axis.horizontal,
+                      itemCount: _trendingTracks.length,
+                      itemBuilder: (context, index) {
+                        final track = _trendingTracks[index];
+                        final isCurrent = player.currentTrack?.id == track.id;
+                        return _buildTrendingCard(track, _trendingTracks, player, isCurrent);
+                      },
+                    ),
+                  ),
+                ),
+              ],
+
               const SliverToBoxAdapter(child: SizedBox(height: 20)),
 
               // Suggested For You Section
@@ -152,14 +221,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       IconButton(
                         icon: const Icon(Icons.refresh, color: Colors.grey, size: 20),
-                        onPressed: _loadRecommendations,
+                        onPressed: _loadAllContent,
                       ),
                     ],
                   ),
                 ),
               ),
 
-              if (_isLoading)
+              if (_isLoading && _suggestedTracks.isEmpty)
                 const SliverToBoxAdapter(
                   child: Padding(
                     padding: EdgeInsets.all(40),
@@ -172,7 +241,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     padding: const EdgeInsets.all(24),
                     child: Center(
                       child: Text(
-                        'Play a few songs to get personalized suggestions!',
+                        'Play songs or search to discover personalized tracks!',
                         textAlign: TextAlign.center,
                         style: TextStyle(color: Colors.grey.shade400),
                       ),
@@ -232,6 +301,80 @@ class _HomeScreenState extends State<HomeScreen> {
               const SliverToBoxAdapter(child: SizedBox(height: 100)),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTrendingCard(
+    Track track,
+    List<Track> playlist,
+    PlayerProvider player,
+    bool isCurrent,
+  ) {
+    return GestureDetector(
+      onTap: () => player.playTrack(track, newQueue: playlist),
+      child: Container(
+        width: 140,
+        margin: const EdgeInsets.only(right: 12),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1E2430),
+          borderRadius: BorderRadius.circular(14),
+          border: isCurrent
+              ? Border.all(color: Theme.of(context).colorScheme.primary, width: 1.5)
+              : null,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
+              child: AspectRatio(
+                aspectRatio: 1,
+                child: track.thumbnailUrl.isNotEmpty
+                    ? CachedNetworkImage(
+                        imageUrl: track.thumbnailUrl,
+                        fit: BoxFit.cover,
+                        placeholder: (_, __) => Container(color: Colors.grey.shade900),
+                        errorWidget: (_, __, ___) => Container(
+                          color: Colors.grey.shade900,
+                          child: const Icon(Icons.music_note, color: Colors.grey),
+                        ),
+                      )
+                    : Container(color: Colors.grey.shade900),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    track.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                      color: isCurrent
+                          ? Theme.of(context).colorScheme.primary
+                          : Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    track.artist,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: Colors.grey.shade400,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

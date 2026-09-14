@@ -49,6 +49,24 @@ class _SearchScreenState extends State<SearchScreen> {
     }
   }
 
+  final List<String> _popularKeywords = [
+    'Top Global Hits',
+    'Trending Pop',
+    'Lofi Chill Beats',
+    'Hip-Hop Classics',
+    'Workout EDM',
+    'Acoustic Covers',
+    'Synthwave 80s',
+    'Bollywood Melodies',
+    'Piano Peace',
+    'Rock Anthems',
+  ];
+
+  void _searchPopular(String query) {
+    _controller.text = query;
+    _executeSearch(query);
+  }
+
   @override
   void dispose() {
     _debounceTimer?.cancel();
@@ -64,6 +82,7 @@ class _SearchScreenState extends State<SearchScreen> {
       backgroundColor: const Color(0xFF10141D),
       body: SafeArea(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
               padding: const EdgeInsets.all(16.0),
@@ -103,25 +122,66 @@ class _SearchScreenState extends State<SearchScreen> {
               )
             else if (_results.isEmpty)
               Expanded(
-                child: Center(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(
-                        Icons.search_rounded,
-                        size: 64,
-                        color: Colors.grey.shade700,
-                      ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 10),
                       Text(
                         _controller.text.isEmpty
-                            ? 'Search any music on YouTube'
-                            : 'No songs found',
-                        style: TextStyle(
-                          color: Colors.grey.shade500,
+                            ? 'Popular Searches & Discover'
+                            : 'No songs found for "${_controller.text}"',
+                        style: const TextStyle(
                           fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
                       ),
+                      const SizedBox(height: 14),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 10,
+                        children: _popularKeywords.map((keyword) {
+                          return ActionChip(
+                            label: Text(keyword),
+                            labelStyle: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            backgroundColor: const Color(0xFF1E2430),
+                            side: BorderSide(
+                              color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            onPressed: () => _searchPopular(keyword),
+                          );
+                        }).toList(),
+                      ),
+                      const SizedBox(height: 30),
+                      if (_controller.text.isEmpty)
+                        Center(
+                          child: Column(
+                            children: [
+                              Icon(
+                                Icons.music_note_rounded,
+                                size: 54,
+                                color: Colors.grey.shade700,
+                              ),
+                              const SizedBox(height: 10),
+                              Text(
+                                'Tap any topic above or type in the search bar',
+                                style: TextStyle(
+                                  color: Colors.grey.shade500,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                     ],
                   ),
                 ),
