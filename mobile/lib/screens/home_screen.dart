@@ -108,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: const Color(0xFF10141D),
       body: SafeArea(
         child: RefreshIndicator(
-          onRefresh: _loadRecommendations,
+          onRefresh: _loadAllContent,
           color: Theme.of(context).colorScheme.primary,
           child: CustomScrollView(
             slivers: [

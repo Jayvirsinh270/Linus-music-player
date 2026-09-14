@@ -40,7 +40,7 @@ void main() async {
     config: const AudioServiceConfig(
       androidNotificationChannelId: 'com.linus.musicplayer.audio',
       androidNotificationChannelName: 'Linus Music Playback',
-      androidNotificationOngoing: true,
+      androidNotificationOngoing: false,
       androidStopForegroundOnPause: false,
     ),
   );
