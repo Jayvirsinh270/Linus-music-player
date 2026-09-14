@@ -26,3 +26,14 @@ plugins {
 }
 
 include ":app"
+
+def flutterSdkPath = {
+    def properties = new Properties()
+    def localPropertiesFile = file("local.properties")
+    if (localPropertiesFile.exists()) {
+        localPropertiesFile.withInputStream { properties.load(it) }
+    }
+    return properties.getProperty("flutter.sdk") ?: System.getenv("FLUTTER_ROOT")
+}()
+
+apply from: "$flutterSdkPath/packages/flutter_tools/gradle/app_plugin_loader.gradle"
