@@ -2,9 +2,15 @@ import 'dart:async';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import '../models/track.dart';
 
+class _CachedAudio {
+  final String url;
+  final DateTime expiry;
+  _CachedAudio(this.url, this.expiry);
+}
+
 class YouTubeService {
   final YoutubeExplode _yt = YoutubeExplode();
-  final Map<String, (String url, DateTime expiry)> _streamCache = {};
+  final Map<String, _CachedAudio> _streamCache = {};
 
   Future<List<Track>> searchTracks(String query) async {
     try {
@@ -24,8 +30,8 @@ class YouTubeService {
   Future<String?> getAudioStreamUrl(String videoId) async {
     // Check if cache has non-expired stream URL (valid for ~4 hours)
     final cached = _streamCache[videoId];
-    if (cached != null && DateTime.now().isBefore(cached.$2)) {
-      return cached.$1;
+    if (cached != null && DateTime.now().isBefore(cached.expiry)) {
+      return cached.url;
     }
 
     try {
@@ -37,7 +43,7 @@ class YouTubeService {
       final bestAudio = audioStreams.withHighestBitrate();
       final streamUrl = bestAudio.url.toString();
 
-      _streamCache[videoId] = (
+      _streamCache[videoId] = _CachedAudio(
         streamUrl,
         DateTime.now().add(const Duration(hours: 3)),
       );
